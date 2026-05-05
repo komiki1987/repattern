@@ -365,7 +365,7 @@ function renderSenpai() {
     card.innerHTML =
       '<div class="card-header">' +
         '<div class="avatar" style="background:'+color+'">'+(s['年代']||'').slice(0,3)+'</div>' +
-        '<div class="card-meta"><strong>'+(s['経験業界タグ']||'').split(/[,、]/)[0].trim()+' / '+(s['職種・役職']||'')+'</strong>'+(s['年代']||'')+' '+(s['性別']||'')+'</div>' +
+        '<div class="card-meta"><strong>'+(s['業界']||'').trim()+' / '+(s['職種・役職']||'')+'</strong>'+(s['年代']||'')+' '+(s['性別']||'')+'</div>' +
       '</div>' +
       '<div class="card-title">「'+(s['タイトル']||'')+'」</div>' +
       '<div class="card-quote">'+(s['転機の一言']||'')+'</div>' +
