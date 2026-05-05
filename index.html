@@ -469,7 +469,7 @@ function scoreMatch(s, moyaText, industry, occupation) {
       if (ep.includes(w)) score+=1;
     }
   });
-  if (industry && (s['経験業界タグ']||'').includes(industry)) score+=2;
+  if (industry && (s['業界']||'').includes(industry)) score+=2;
   if (occupation && (s['経験職種タグ']||'').includes(occupation)) score+=2;
   if (selectedAction && (s['行動スタイルタグ']||'').includes(selectedAction)) score+=2;
   return score;
