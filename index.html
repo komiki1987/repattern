@@ -401,8 +401,8 @@ function openDetail(s) {
     '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;">'+moyaTags+'</div>' +
     '<div class="m-quote">'+(s['転機の一言']||'')+'</div>' +
     '<div class="m-sec"><div class="m-sec-label">エピソード</div><p>'+(s['エピソード要約（公開用）']||'').replace(/\n/g,'<br>')+'</p></div>' +
-    '<div class="m-sec"><div class="m-sec-label">手放したもの</div><p>'+(s['手放したもの']||'—')+'</p></div>' +
-    '<div class="m-sec"><div class="m-sec-label">後輩が学べること</div><p>'+(s['後輩が学べること']||'—')+'</p></div>' +
+    '<div class="m-sec"><div class="m-sec-label">手放したもの</div><p>'+(s['手放したもの']||'—').replace(/\n/g,'<br>')+'</p></div>' +
+    '<div class="m-sec"><div class="m-sec-label">後輩が学べること</div><p>'+(s['後輩が学べること']||'—').replace(/\n/g,'<br>')+'</p></div>' +
     '<div class="m-step">'+(s['最初の一手']||'—')+'</div>' +
     '<div style="display:flex;flex-wrap:wrap;gap:6px;">'+kohaiTags+'</div>';
   openModal('detail-modal');
@@ -469,7 +469,7 @@ function scoreMatch(s, moyaText, industry, occupation) {
       if (ep.includes(w)) score+=1;
     }
   });
-  if (industry && (s['業界']||'').includes(industry)) score+=2;
+  if (industry && (s['経験業界タグ']||'').includes(industry)) score+=2;
   if (occupation && (s['経験職種タグ']||'').includes(occupation)) score+=2;
   if (selectedAction && (s['行動スタイルタグ']||'').includes(selectedAction)) score+=2;
   return score;
