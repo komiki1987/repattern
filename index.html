@@ -306,7 +306,7 @@ function checkMatchingPw() {
 
 async function loadData() {
   try {
-    var res = await fetch(GAS_URL);
+    var res = await fetch(GAS_URL, {redirect:'follow'});
     var data = await res.json();
     allSenpai = Array.isArray(data) ? data : [];
     renderFilters();
