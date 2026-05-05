@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repattern — キャリアの転機を、型にする</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root {
+  --c-bg:#f7f2ea; --c-white:#ffffff; --c-text:#1a1a2e; --c-sub:#6b6258;
+  --c-border:#e0d5c4; --c-accent:#1e2d4a; --c-accent2:#c8602a;
+  --c-gold:#b8922a; --c-cream:#f5ede0; --c-sand:#e8d5bc;
+  --c-tag-bg:#f0e8d8; --radius:12px; --radius-sm:8px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif; background:var(--c-bg); color:var(--c-text); font-size:15px; line-height:1.7; }
+a { color:inherit; text-decoration:none; }
+nav { position:sticky; top:0; z-index:100; background:var(--c-accent); border-bottom:3px solid var(--c-gold); padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:56px; }
+.nav-logo { font-size:16px; font-weight:700; letter-spacing:.06em; color:var(--c-cream); }
+.nav-links { display:flex; gap:24px; font-size:13px; color:var(--c-sand); }
+.nav-links a:hover { color:var(--c-cream); }
+section { padding:64px 24px; }
+.inner { max-width:960px; margin:0 auto; }
+.s-label { font-size:11px; letter-spacing:.14em; color:var(--c-gold); text-transform:uppercase; margin-bottom:8px; }
+.s-title { font-size:clamp(20px,3vw,28px); font-weight:700; margin-bottom:12px; }
+.s-desc { font-size:14px; color:var(--c-sub); margin-bottom:36px; line-height:1.8; }
+hr { border:none; border-top:1px solid var(--c-border); }
+.hero { padding:80px 24px 64px; text-align:center; max-width:720px; margin:0 auto; }
+.hero-label { font-size:12px; letter-spacing:.12em; color:var(--c-gold); text-transform:uppercase; margin-bottom:16px; }
+.hero h1 { font-size:clamp(28px,5vw,42px); font-weight:700; line-height:1.3; margin-bottom:20px; }
+.hero p { font-size:16px; color:var(--c-sub); line-height:1.9; margin-bottom:36px; }
+.hero-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.btn { display:inline-block; padding:12px 28px; border-radius:100px; font-size:14px; font-weight:600; cursor:pointer; transition:opacity .2s; border:none; }
+.btn-primary { background:var(--c-accent); color:var(--c-cream); }
+.btn-outline { background:transparent; color:var(--c-accent2); border:2px solid var(--c-accent2); }
+.btn:hover { opacity:.8; }
+.concept-grid { display:grid; grid-template-columns:1fr; gap:16px; }
+.concept-card { background:var(--c-white); border:1px solid var(--c-border); border-radius:var(--radius); padding:24px; display:flex; gap:20px; align-items:flex-start; }
+.concept-num { font-size:28px; font-weight:700; color:var(--c-gold); flex-shrink:0; line-height:1; width:40px; }
+.concept-card h3 { font-size:15px; font-weight:700; margin-bottom:8px; }
+.concept-card p { font-size:13px; color:var(--c-sub); line-height:1.8; }
+.summary-box { background:var(--c-cream); border:1px solid var(--c-sand); border-left:4px solid var(--c-gold); border-radius:var(--radius); padding:24px 28px; margin-bottom:32px; }
+.summary-box p { font-size:14px; color:var(--c-sub); line-height:2; }
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:16px; margin-bottom:32px; }
+.stat-card { background:var(--c-white); border:1px solid var(--c-border); border-radius:var(--radius-sm); padding:16px 20px; }
+.stat-label { font-size:12px; color:var(--c-sub); margin-bottom:4px; }
+.stat-val { font-size:26px; font-weight:700; color:var(--c-accent); }
+.bar-charts { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:24px; }
+.bar-chart h4 { font-size:13px; font-weight:700; margin-bottom:12px; }
+.bar-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.bar-label { font-size:12px; color:var(--c-sub); width:130px; flex-shrink:0; text-align:right; }
+.bar-track { flex:1; background:var(--c-tag-bg); border-radius:4px; height:10px; }
+.bar-fill { height:10px; border-radius:4px; background:var(--c-accent2); transition:width .6s ease; }
+.bar-count { font-size:12px; color:var(--c-sub); width:20px; flex-shrink:0; }
+.legend { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:20px; }
+.legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--c-sub); }
+.legend-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+.filter-bar { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px; }
+.filter-btn { padding:6px 16px; border-radius:100px; font-size:12px; border:1px solid var(--c-border); background:var(--c-white); color:var(--c-sub); cursor:pointer; transition:all .15s; }
+.filter-btn.active { background:var(--c-accent); color:#fff; border-color:var(--c-accent); }
+.senpai-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:24px; }
+.senpai-card { background:var(--c-white); border:1px solid var(--c-border); border-radius:var(--radius); padding:20px; cursor:pointer; transition:box-shadow .2s,transform .15s; }
+.senpai-card:hover { box-shadow:0 4px 20px rgba(0,0,0,.08); transform:translateY(-2px); }
+.card-header { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.avatar { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+.card-meta { font-size:12px; color:var(--c-sub); }
+.card-meta strong { font-size:13px; color:var(--c-text); font-weight:700; display:block; margin-bottom:2px; }
+.card-title { font-size:14px; font-weight:700; line-height:1.5; margin-bottom:10px; }
+.card-quote { font-size:12px; color:var(--c-accent2); font-style:italic; border-left:2px solid var(--c-gold); padding-left:10px; margin-bottom:12px; line-height:1.6; }
+.tag { font-size:11px; background:var(--c-tag-bg); color:var(--c-sub); padding:3px 10px; border-radius:100px; }
+.tag-ind { font-size:11px; background:#f0f0f5; color:#5a5a7a; padding:3px 10px; border-radius:100px; }
+.tag-occ { font-size:11px; background:#f5f0e8; color:#7a5a3a; padding:3px 10px; border-radius:100px; }
+.more-btn { display:block; width:100%; padding:13px; background:transparent; border:1.5px solid var(--c-accent); color:var(--c-accent); border-radius:100px; font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; }
+.more-btn:hover { background:var(--c-accent); color:var(--c-cream); }
+.matching-steps { display:grid; grid-template-columns:1fr; gap:20px; }
+.step-card { border:1px solid var(--c-border); border-radius:var(--radius); padding:24px; background:var(--c-white); }
+.step-num { font-size:12px; font-weight:700; color:var(--c-accent2); margin-bottom:8px; }
+.step-card h3 { font-size:15px; font-weight:700; margin-bottom:14px; }
+textarea { width:100%; border:1px solid var(--c-border); border-radius:var(--radius-sm); padding:12px; font-size:14px; font-family:inherit; resize:vertical; min-height:100px; background:var(--c-bg); }
+textarea:focus { outline:2px solid var(--c-accent); border-color:transparent; }
+input[type=text], input[type=password] { width:100%; border:1px solid var(--c-border); border-radius:var(--radius-sm); padding:10px 12px; font-size:14px; font-family:inherit; background:var(--c-bg); }
+input[type=text]:focus, input[type=password]:focus { outline:2px solid var(--c-accent); border-color:transparent; }
+.radio-group { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+.radio-btn { padding:7px 16px; border-radius:100px; font-size:13px; border:1px solid var(--c-border); background:var(--c-white); cursor:pointer; transition:all .15s; }
+.radio-btn.selected { background:var(--c-accent); color:#fff; border-color:var(--c-accent); }
+.match-run-btn { display:block; width:100%; margin-top:20px; padding:14px; background:var(--c-accent); color:var(--c-cream); border:none; border-radius:100px; font-size:15px; font-weight:700; cursor:pointer; transition:opacity .2s; }
+.match-run-btn:hover { opacity:.85; }
+.match-run-btn:disabled { opacity:.4; cursor:not-allowed; }
+.match-card { background:var(--c-bg); border:1px solid var(--c-border); border-radius:var(--radius); padding:20px; }
+.match-rank { font-size:11px; font-weight:700; color:var(--c-accent2); margin-bottom:8px; }
+.match-card h4 { font-size:15px; font-weight:700; margin-bottom:6px; }
+.match-reason { font-size:13px; color:var(--c-sub); line-height:1.8; margin-top:10px; padding-top:10px; border-top:1px solid var(--c-border); }
+.match-reason.loading { color:var(--c-accent); font-style:italic; }
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; overflow-y:auto; padding:24px; }
+.modal-overlay.open { display:flex; align-items:flex-start; justify-content:center; }
+.modal { background:var(--c-white); border-radius:var(--radius); max-width:640px; width:100%; padding:32px; position:relative; margin:auto; }
+.modal-close { position:absolute; top:16px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--c-sub); }
+.m-sub { font-size:13px; color:var(--c-sub); margin-bottom:20px; }
+.m-sec { margin-bottom:20px; }
+.m-sec-label { font-size:11px; letter-spacing:.1em; color:var(--c-gold); text-transform:uppercase; margin-bottom:6px; }
+.m-sec p { font-size:14px; line-height:1.9; color:var(--c-sub); }
+.m-quote { background:var(--c-cream); border-left:3px solid var(--c-gold); padding:14px 16px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-size:14px; font-style:italic; color:var(--c-text); margin-bottom:20px; }
+.m-step { background:#eef0f5; border-radius:var(--radius-sm); padding:14px 16px; font-size:14px; color:var(--c-accent); margin-bottom:20px; }
+.m-step::before { content:"最初の一手 → "; font-weight:700; }
+.pw-box { background:var(--c-white); border:1px solid var(--c-border); border-radius:var(--radius); padding:40px 24px; text-align:center; }
+.pw-box h3 { font-size:18px; font-weight:700; margin-bottom:8px; }
+.pw-box p { font-size:13px; color:var(--c-sub); margin-bottom:24px; }
+.pw-row { display:flex; gap:8px; max-width:320px; margin:0 auto; }
+.pw-error { font-size:13px; color:#e05a3a; margin-top:10px; }
+.ai-presets { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub); border-top:1px solid var(--c-border); }
+#senpai-loading { text-align:center; padding:48px; color:var(--c-sub); font-size:14px; }
+@media (max-width:600px) { .nav-links { display:none; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Repattern</div>
+  <div class="nav-links">
+    <a href="#concept">コンセプト</a>
+    <a href="#stats">データ</a>
+    <a href="#senpai">せんぱい一覧</a>
+    <a href="#matching">マッチング</a>
+  </div>
+</nav>
+
+<section class="hero" style="padding:80px 24px 64px;">
+  <div class="hero-label">Career Pattern Lab</div>
+  <div style="margin-bottom:28px;">
+    <div style="font-size:clamp(40px,8vw,72px);font-weight:700;letter-spacing:.06em;color:var(--c-accent);line-height:1;margin-bottom:10px;">Repattern</div>
+    <div style="font-size:clamp(16px,2.5vw,22px);font-weight:700;color:var(--c-accent2);letter-spacing:.04em;">キャリアの転機を、型にする。</div>
+  </div>
+  <p>悩んでいるのはあなただけじゃない。<br>先を歩いた人の「転機の型」が、次の一歩を照らす。</p>
+  <div class="hero-btns">
+    <button class="btn btn-primary" onclick="scrollToId('matching')">マッチングを試す</button>
+    <button class="btn btn-outline" onclick="scrollToId('senpai')">せんぱいを見る</button>
+  </div>
+</section>
+<hr>
+
+<section id="concept" style="background:var(--c-white);">
+  <div class="inner">
+    <div class="s-label">Concept</div>
+    <div class="s-title">なぜ Repattern なのか</div>
+    <div class="s-desc">キャリアの悩みは、答えを急ぐより「似た転機を経た人の話」を聞くことで、動き出せることがある。</div>
+    <div class="concept-grid">
+      <div class="concept-card"><div class="concept-num">01</div><div><h3>転機には「型」がある</h3><p>一見バラバラに見えるキャリアの変化も、パターンに分類できる。あなたのモヤモヤに近い型を持つ先輩が、必ずいる。</p></div></div>
+      <div class="concept-card"><div class="concept-num">02</div><div><h3>しくじりも資産になる</h3><p>成功談だけでなく、失敗・割り切り・本音のしんどさまで共有する。だから、リアルな参考になる。</p></div></div>
+      <div class="concept-card"><div class="concept-num">03</div><div><h3>受け取ったものを返す</h3><p>先輩が後輩へ、後輩がまた次の世代へ。キャリアの知恵を循環させるプラットフォームを目指す。</p></div></div>
+    </div>
+  </div>
+</section>
+<hr>
+
+<section id="stats">
+  <div class="inner">
+    <div class="s-label">Data</div>
+    <div class="s-title">せんぱいDB の傾向</div>
+    <div class="s-desc">インタビューデータから見えてくるキャリア転機のパターン。</div>
+    <div class="summary-box"><p id="summary-text">データを読み込み中...</p></div>
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="bar-charts" id="bar-charts"></div>
+    <div style="margin-top:32px;text-align:center;">
+      <button class="btn btn-outline" onclick="openAiAnalysis()">AI深掘り分析（管理者用）</button>
+    </div>
+  </div>
+</section>
+<hr>
+
+<section id="senpai" style="background:var(--c-white);">
+  <div class="inner">
+    <div class="s-label">Senpai Database</div>
+    <div class="s-title">せんぱい一覧</div>
+    <div class="s-desc">実際のキャリア転機を語ってくれた先輩たちのストーリー。</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#1e2d4a;"></div>機会捕捉型</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#c8602a;"></div>越境再編集型</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#b8922a;"></div>戦略蓄積型</div>
+    </div>
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-btn active" onclick="applyFilter('all',this)">すべて</button>
+    </div>
+    <div id="senpai-loading">データを読み込み中...</div>
+    <div class="senpai-grid" id="senpai-grid" style="display:none;"></div>
+    <button class="more-btn" id="more-btn" style="display:none;" onclick="showMore()">もっと見る</button>
+  </div>
+</section>
+<hr>
+
+<section id="matching">
+  <div class="inner">
+    <div class="s-label">Matching</div>
+    <div class="s-title">あなたにマッチする先輩を探す</div>
+    <div class="s-desc">今のモヤモヤを入力すると、似た転機を経験した先輩を3名提案します。</div>
+    <div id="matching-lock" class="pw-box">
+      <div style="font-size:32px;margin-bottom:16px;">🔒</div>
+      <h3>マッチング機能を使うにはパスワードが必要です</h3>
+      <p>サービス利用者の方はパスワードを入力してください。</p>
+      <div class="pw-row">
+        <input type="password" id="matching-pw-input" placeholder="パスワードを入力" onkeydown="if(event.key==='Enter')checkMatchingPw()">
+        <button class="btn btn-primary" onclick="checkMatchingPw()" style="white-space:nowrap;padding:10px 20px;">解錠</button>
+      </div>
+      <div class="pw-error" id="matching-pw-error"></div>
+    </div>
+    <div id="matching-body" style="display:none;">
+      <div class="matching-steps">
+        <div class="step-card">
+          <div class="step-num">STEP 01</div>
+          <h3>今のモヤモヤを教えてください</h3>
+          <textarea id="moya-text" placeholder="例）今の仕事で成果は出ているけど、このまま年次を重ねていくことへの焦りがある。次に何をすべきかわからない。"></textarea>
+        </div>
+        <div class="step-card">
+          <div class="step-num">STEP 02</div>
+          <h3>あなたのプロフィール（任意）</h3>
+          <div style="display:grid;gap:10px;">
+            <input type="text" id="match-industry" placeholder="業界（例：IT、人材、金融）">
+            <input type="text" id="match-occupation" placeholder="職種（例：営業、企画、エンジニア）">
+          </div>
+          <div style="margin-top:14px;">
+            <div style="font-size:13px;color:var(--c-sub);margin-bottom:6px;">行動スタイル</div>
+            <div class="radio-group" id="action-style-group">
+              <div class="radio-btn" data-val="見切り発車型">見切り発車型</div>
+              <div class="radio-btn" data-val="準備してから動く">準備してから動く</div>
+              <div class="radio-btn" data-val="内省しながら変化">内省しながら変化</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="match-run-btn" id="match-btn" onclick="runMatching()">マッチングする</button>
+      <div id="match-results" style="display:grid;gap:14px;margin-top:28px;"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="font-weight:700;font-size:14px;margin-bottom:6px;">Repattern</div>
+  <div>キャリアの転機を、型にする。</div>
+  <div style="margin-top:12px;">© 2025 Repattern</div>
+</footer>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detail-modal" onclick="if(event.target===this)closeModal('detail-modal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('detail-modal')">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<!-- PW MODAL (AI) -->
+<div class="modal-overlay" id="pw-modal" onclick="if(event.target===this)closeModal('pw-modal')">
+  <div class="modal" style="max-width:400px;text-align:center;">
+    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">管理者認証</h3>
+    <p style="font-size:13px;color:var(--c-sub);margin-bottom:20px;">AI深掘り分析はRepattern管理者専用です。</p>
+    <input type="password" id="pw-input" placeholder="パスワードを入力" style="text-align:center;letter-spacing:.2em;margin-bottom:12px;" onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="btn btn-primary" onclick="checkPw()" style="width:100%;padding:12px;">認証する</button>
+    <div class="pw-error" id="pw-error"></div>
+    <div style="margin-top:12px;"><button style="background:none;border:none;color:var(--c-sub);font-size:13px;cursor:pointer;" onclick="closeModal('pw-modal')">キャンセル</button></div>
+  </div>
+</div>
+
+<!-- AI MODAL -->
+<div class="modal-overlay" id="ai-modal" onclick="if(event.target===this)closeModal('ai-modal')">
+  <div class="modal" style="max-width:700px;">
+    <button class="modal-close" onclick="closeModal('ai-modal')">✕</button>
+    <div style="font-size:18px;font-weight:700;margin-bottom:16px;">AI深掘り分析</div>
+    <div class="ai-presets" id="ai-presets"></div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <input type="text" id="ai-input" placeholder="分析したいことを自由に入力...">
+      <button class="btn btn-primary" onclick="runAiAnalysis()" style="white-space:nowrap;padding:10px 20px;">分析</button>
+    </div>
+    <div id="ai-result" style="font-size:14px;line-height:1.9;color:var(--c-sub);white-space:pre-wrap;min-height:80px;"></div>
+  </div>
+</div>
+
+<script>
+var GAS_URL = "https://script.google.com/macros/s/AKfycbzHM2I2pi_dD89AzV6aHhsE4Ls2Z8n_n0KsXCTs7Q3jdyedTF6OSHISSi6Y2YuyTvd8/exec";
+var ADMIN_PW = "repattern2025";
+var MATCHING_PW = "repattern2025";
+var CAREER_COLOR = {'機会捕捉型':'#1e2d4a','越境再編集型':'#c8602a','戦略蓄積型':'#b8922a'};
+var AI_PRESETS = [
+  '「手放したもの」に共通する心理的パターンを分析して',
+  '転機トリガーが外発か内発かで分類し、行動スタイルとの相関を見て',
+  '行動スタイル別の転機パターンの違いを教えて',
+  'コーハイへのマッチング精度を上げるために重要な軸を提案して',
+  'このDBから見える「転機に必要な心理的コスト」をまとめて'
+];
+var allSenpai = [];
+var showing = 3;
+var currentFilter = 'all';
+var selectedAction = '';
+var aiUnlocked = false;
+
+function scrollToId(id) { document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
+function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+
+function checkMatchingPw() {
+  if (document.getElementById('matching-pw-input').value === MATCHING_PW) {
+    document.getElementById('matching-lock').style.display = 'none';
+    document.getElementById('matching-body').style.display = 'block';
+  } else {
+    document.getElementById('matching-pw-error').textContent = 'パスワードが正しくありません';
+  }
+}
+
+async function loadData() {
+  try {
+    var res = await fetch(GAS_URL);
+    var data = await res.json();
+    allSenpai = Array.isArray(data) ? data : [];
+    renderFilters();
+    renderSenpai();
+    renderStats();
+  } catch(e) {
+    document.getElementById('senpai-loading').textContent = 'データの読み込みに失敗しました。';
+  }
+}
+
+function renderFilters() {
+  var types = [...new Set(allSenpai.map(function(s){ return s['キャリア上昇類型']; }).filter(Boolean))];
+  var bar = document.getElementById('filter-bar');
+  types.forEach(function(t) {
+    var btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.textContent = t;
+    btn.onclick = function(){ applyFilter(t, btn); };
+    bar.appendChild(btn);
+  });
+}
+
+function getFiltered() {
+  if (currentFilter === 'all') {
+    var types = ['機会捕捉型','越境再編集型','戦略蓄積型'];
+    var initial = [];
+    types.forEach(function(t){
+      var found = allSenpai.find(function(s){ return s['キャリア上昇類型'] === t; });
+      if (found) initial.push(found);
+    });
+    var rest = allSenpai.filter(function(s){ return initial.indexOf(s) === -1; });
+    return initial.concat(rest);
+  }
+  return allSenpai.filter(function(s){ return s['キャリア上昇類型'] === currentFilter; });
+}
+
+function renderSenpai() {
+  var filtered = getFiltered();
+  var loading = document.getElementById('senpai-loading');
+  var grid = document.getElementById('senpai-grid');
+  var moreBtn = document.getElementById('more-btn');
+  loading.style.display = 'none';
+  grid.style.display = 'grid';
+  grid.innerHTML = '';
+  filtered.slice(0, showing).forEach(function(s) {
+    var career = s['キャリア上昇類型'] || '';
+    var color = CAREER_COLOR[career] || '#1e2d4a';
+    var moya = (s['モヤモヤタイプ'] || '').split(/[,、\n]/).map(function(t){ return t.trim(); }).filter(Boolean);
+    var ind = (s['経験業界タグ'] || '').split(/[,、\n]/).map(function(t){ return t.trim(); }).filter(Boolean);
+    var occ = (s['経験職種タグ'] || '').split(/[,、\n]/).map(function(t){ return t.trim(); }).filter(Boolean);
+    var moyaTags = moya.map(function(t){ return '<span class="tag">'+t+'</span>'; }).join('');
+    var indTags = ind.map(function(t){ return '<span class="tag-ind">'+t+'</span>'; }).join('');
+    var occTags = occ.map(function(t){ return '<span class="tag-occ">'+t+'</span>'; }).join('');
+    var card = document.createElement('div');
+    card.className = 'senpai-card';
+    card.innerHTML =
+      '<div class="card-header">' +
+        '<div class="avatar" style="background:'+color+'">'+(s['年代']||'').slice(0,3)+'</div>' +
+        '<div class="card-meta"><strong>'+(s['経験業界タグ']||'').split(/[,、]/)[0].trim()+' / '+(s['職種・役職']||'')+'</strong>'+(s['年代']||'')+' '+(s['性別']||'')+'</div>' +
+      '</div>' +
+      '<div class="card-title">「'+(s['タイトル']||'')+'」</div>' +
+      '<div class="card-quote">'+(s['転機の一言']||'')+'</div>' +
+      '<div style="display:flex;flex-direction:column;gap:6px;">' +
+        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-size:10px;color:var(--c-sub);flex-shrink:0;">モヤモヤ</span>'+moyaTags+'</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-size:10px;color:var(--c-sub);flex-shrink:0;">業界</span>'+indTags+'</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-size:10px;color:var(--c-sub);flex-shrink:0;">職種</span>'+occTags+'</div>' +
+      '</div>';
+    card.onclick = function(){ openDetail(s); };
+    grid.appendChild(card);
+  });
+  moreBtn.style.display = filtered.length > showing ? 'block' : 'none';
+}
+
+function showMore() { showing += 3; renderSenpai(); }
+
+function applyFilter(val, btn) {
+  currentFilter = val; showing = 3;
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderSenpai();
+}
+
+function openDetail(s) {
+  var moya = (s['モヤモヤタイプ']||'').split(/[,、\n]/).map(function(t){ return t.trim(); }).filter(Boolean);
+  var kohai = (s['得意な後輩タイプ']||'').split(/[,、\n]/).map(function(t){ return t.trim(); }).filter(Boolean);
+  var moyaTags = moya.map(function(t){ return '<span class="tag">'+t+'</span>'; }).join('');
+  var kohaiTags = kohai.map(function(t){ return '<span class="tag">'+t+'</span>'; }).join('');
+  document.getElementById('modal-content').innerHTML =
+    '<div style="font-size:12px;color:var(--c-sub);margin-bottom:4px;">'+(s['年代']||'')+' '+(s['性別']||'')+' / '+(s['職種・役職']||'')+'</div>' +
+    '<h2 style="font-size:18px;font-weight:700;margin-bottom:6px;">「'+(s['タイトル']||'')+'」</h2>' +
+    '<div class="m-sub">'+(s['キャリア上昇類型']||'')+' / '+(s['行動スタイルタグ']||'')+'</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;">'+moyaTags+'</div>' +
+    '<div class="m-quote">'+(s['転機の一言']||'')+'</div>' +
+    '<div class="m-sec"><div class="m-sec-label">エピソード</div><p>'+(s['エピソード要約（公開用）']||'').replace(/\n/g,'<br>')+'</p></div>' +
+    '<div class="m-sec"><div class="m-sec-label">手放したもの</div><p>'+(s['手放したもの']||'—')+'</p></div>' +
+    '<div class="m-sec"><div class="m-sec-label">後輩が学べること</div><p>'+(s['後輩が学べること']||'—')+'</p></div>' +
+    '<div class="m-step">'+(s['最初の一手']||'—')+'</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;">'+kohaiTags+'</div>';
+  openModal('detail-modal');
+}
+
+function renderStats() {
+  var total = allSenpai.length;
+  var female = allSenpai.filter(function(s){ return s['性別']==='女性'; }).length;
+  var male = allSenpai.filter(function(s){ return s['性別']==='男性'; }).length;
+  document.getElementById('stats-grid').innerHTML =
+    '<div class="stat-card"><div class="stat-label">インタビュー数</div><div class="stat-val">'+total+'名</div></div>' +
+    '<div class="stat-card"><div class="stat-label">男性 / 女性</div><div class="stat-val">'+male+' / '+female+'</div></div>' +
+    '<div class="stat-card"><div class="stat-label">年代スパン</div><div class="stat-val">30〜50代</div></div>';
+
+  var charts = [
+    {title:'キャリア上昇類型', key:'キャリア上昇類型', split:false},
+    {title:'モヤモヤタイプ TOP6', key:'モヤモヤタイプ', split:true, limit:6},
+    {title:'行動スタイル', key:'行動スタイルタグ', split:false}
+  ];
+  var bc = document.getElementById('bar-charts');
+  bc.innerHTML = '';
+  charts.forEach(function(c) {
+    var count = {};
+    allSenpai.forEach(function(s) {
+      var val = s[c.key] || '';
+      if (c.split) {
+        val.split(/[,、\n]/).map(function(t){ return t.trim(); }).filter(Boolean).forEach(function(t){ count[t]=(count[t]||0)+1; });
+      } else {
+        if (val) count[val]=(count[val]||0)+1;
+      }
+    });
+    var sorted = Object.entries(count).sort(function(a,b){ return b[1]-a[1]; });
+    if (c.limit) sorted = sorted.slice(0, c.limit);
+    var max = sorted[0] ? sorted[0][1] : 1;
+    var div = document.createElement('div');
+    div.className = 'bar-chart';
+    div.innerHTML = '<h4>'+c.title+'</h4>' + sorted.map(function(item){
+      return '<div class="bar-row"><div class="bar-label">'+item[0]+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(item[1]/max*100)+'%"></div></div><div class="bar-count">'+item[1]+'</div></div>';
+    }).join('');
+    bc.appendChild(div);
+  });
+
+  document.getElementById('summary-text').textContent =
+    '現在'+total+'名のせんぱいデータから見えてくる共通のパターンがあります。最も多いモヤモヤは「将来不安型」と「成長停滞型」で、「このままでいいのか」という問いを抱えた転機が多数を占めます。行動スタイルでは「準備してから動く」タイプが最多で、転機は衝動的な決断よりも、違和感を温めながら機会を待ち構えて動いた事例が目立ちます。転機の型では「役割変容型」が最頻出で、劇的な業界転換より、同じ組織や環境の中で役割を広げることで転機を掴んだケースが多いことがわかります。';
+}
+
+document.querySelectorAll('#action-style-group .radio-btn').forEach(function(btn){
+  btn.onclick = function(){
+    document.querySelectorAll('#action-style-group .radio-btn').forEach(function(b){ b.classList.remove('selected'); });
+    btn.classList.add('selected');
+    selectedAction = btn.dataset.val;
+  };
+});
+
+function scoreMatch(s, moyaText, industry, occupation) {
+  var score = 0;
+  var moya = s['モヤモヤタイプ']||'';
+  var kohai = s['得意な後輩タイプ']||'';
+  var ep = (s['エピソード要約（分析用）']||'')+(s['後輩が学べること']||'');
+  moyaText.split(/[\s、。,]/).forEach(function(w){
+    if (w.length > 1) {
+      if (moya.includes(w)) score+=3;
+      if (kohai.includes(w)) score+=2;
+      if (ep.includes(w)) score+=1;
+    }
+  });
+  if (industry && (s['経験業界タグ']||'').includes(industry)) score+=2;
+  if (occupation && (s['経験職種タグ']||'').includes(occupation)) score+=2;
+  if (selectedAction && (s['行動スタイルタグ']||'').includes(selectedAction)) score+=2;
+  return score;
+}
+
+async function runMatching() {
+  var moyaText = document.getElementById('moya-text').value.trim();
+  if (!moyaText) { alert('モヤモヤを入力してください'); return; }
+  var industry = document.getElementById('match-industry').value.trim();
+  var occupation = document.getElementById('match-occupation').value.trim();
+  var btn = document.getElementById('match-btn');
+  btn.disabled = true; btn.textContent = 'マッチング中...';
+  var scored = allSenpai.map(function(s){ return {s:s, score:scoreMatch(s,moyaText,industry,occupation)}; })
+    .sort(function(a,b){ return b.score-a.score; }).slice(0,3);
+  var results = document.getElementById('match-results');
+  results.innerHTML = scored.map(function(item,i){
+    var s = item.s;
+    return '<div class="match-card" id="match-'+i+'">' +
+      '<div class="match-rank">MATCH '+(i+1)+'</div>' +
+      '<h4>「'+(s['タイトル']||'')+'」</h4>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;"><span class="tag">'+(s['年代']||'')+' '+(s['性別']||'')+'</span></div>' +
+      '<div class="match-reason loading" id="reason-'+i+'">マッチング理由を生成中...</div>' +
+    '</div>';
+  }).join('');
+  btn.disabled = false; btn.textContent = 'マッチングする';
+  scored.forEach(async function(item, i){
+    var s = item.s;
+    try {
+      var res = await fetch(GAS_URL, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({action:'generateReason', moyaText:moyaText, industry:industry, occupation:occupation, action2:selectedAction,
+          senpai:{type:s['転機の型']||'', moya:s['モヤモヤタイプ']||'', episode:s['エピソード要約（分析用）']||'', firstStep:s['最初の一手']||'', coachType:s['得意な後輩タイプ']||''}})
+      });
+      var data = await res.json();
+      var el = document.getElementById('reason-'+i);
+      if (el) { el.textContent = data.reason||''; el.classList.remove('loading'); }
+    } catch(e) {
+      var el = document.getElementById('reason-'+i);
+      if (el) { el.textContent = 'この先輩の経験がヒントになるかもしれません。'; el.classList.remove('loading'); }
+    }
+  });
+}
+
+function openAiAnalysis() {
+  if (aiUnlocked) { showAiModal(); } else { openModal('pw-modal'); }
+}
+function checkPw() {
+  if (document.getElementById('pw-input').value === ADMIN_PW) {
+    aiUnlocked = true;
+    closeModal('pw-modal');
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-error').textContent = '';
+    showAiModal();
+  } else {
+    document.getElementById('pw-error').textContent = 'パスワードが正しくありません';
+  }
+}
+function showAiModal() {
+  var c = document.getElementById('ai-presets');
+  c.innerHTML = AI_PRESETS.map(function(p){
+    return '<button class="filter-btn" onclick="document.getElementById(\'ai-input\').value=\''+p+'\';runAiAnalysis()">'+p+'</button>';
+  }).join('');
+  openModal('ai-modal');
+}
+async function runAiAnalysis() {
+  var q = document.getElementById('ai-input').value.trim();
+  if (!q) return;
+  var el = document.getElementById('ai-result');
+  el.textContent = '分析中...';
+  var dbSummary = allSenpai.map(function(s){
+    return '['+s['年代']+s['性別']+' '+s['キャリア上昇類型']+'] モヤモヤ='+s['モヤモヤタイプ']+' スタイル='+s['行動スタイルタグ']+' タイトル='+s['タイトル']+' 手放したもの='+s['手放したもの'];
+  }).join('\n');
+  try {
+    var res = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({model:"claude-sonnet-4-20250514", max_tokens:1000,
+        system:"あなたはキャリア転機データの分析専門家です。以下はRepatternのせんぱいDB（"+allSenpai.length+"名）です。\n"+dbSummary+"\nこのデータをもとに日本語で具体的・構造的に答えてください。",
+        messages:[{role:"user",content:q}]})
+    });
+    var data = await res.json();
+    el.textContent = (data.content&&data.content[0]&&data.content[0].text) || 'エラーが発生しました';
+  } catch(e) {
+    el.textContent = 'エラーが発生しました: '+e.message;
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
