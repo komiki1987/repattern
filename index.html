@@ -274,7 +274,7 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
 </div>
 
 <script>
-var GAS_URL = "https://script.google.com/macros/s/AKfycbzRLPSAX5nhj-p_St8A5n6kLBAXmUp-3RtQctl96Am8z7-odjl8Tn2Ges_TegB8rZUI/exec";
+var GAS_URL = "https://script.google.com/macros/s/AKfycbzHM2I2pi_dD89AzV6aHhsE4Ls2Z8n_n0KsXCTs7Q3jdyedTF6OSHISSi6Y2YuyTvd8/exec";
 var ADMIN_PW = "repattern2025";
 var MATCHING_PW = "repattern2025";
 var CAREER_COLOR = {'機会捕捉型':'#1e2d4a','越境再編集型':'#c8602a','戦略蓄積型':'#b8922a'};
@@ -544,16 +544,19 @@ async function runAiAnalysis() {
     return '['+s['年代']+s['性別']+' '+s['キャリア上昇類型']+'] モヤモヤ='+s['モヤモヤタイプ']+' スタイル='+s['行動スタイルタグ']+' タイトル='+s['タイトル']+' 手放したもの='+s['手放したもの'];
   }).join('\n');
   try {
-    var res = await fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({model:"claude-sonnet-4-20250514", max_tokens:1000,
-        system:"あなたはキャリア転機データの分析専門家です。以下はRepatternのせんぱいDB（"+allSenpai.length+"名）です。\n"+dbSummary+"\nこのデータをもとに日本語で具体的・構造的に答えてください。",
-        messages:[{role:"user",content:q}]})
+    var res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        action: 'analyzeDB',
+        question: q,
+        dbSummary: dbSummary
+      })
     });
     var data = await res.json();
-    el.textContent = (data.content&&data.content[0]&&data.content[0].text) || 'エラーが発生しました';
+    el.textContent = data.result || 'エラーが発生しました';
   } catch(e) {
-    el.textContent = 'エラーが発生しました: '+e.message;
+    el.textContent = 'エラーが発生しました: ' + e.message;
   }
 }
 
