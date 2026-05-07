@@ -472,40 +472,89 @@ function scoreMatch(s, moyaText, industry, occupation) {
 
 async function runMatching() {
   var moyaText = document.getElementById('moya-text').value.trim();
-  if (!moyaText) { alert('モヤモヤを入力してください'); return; }
+  if (!moyaText) {
+    alert('モヤモヤを入力してください');
+    return;
+  }
+
   var industry = document.getElementById('match-industry').value.trim();
   var occupation = document.getElementById('match-occupation').value.trim();
   var btn = document.getElementById('match-btn');
-  btn.disabled = true; btn.textContent = 'マッチング中...';
-  var scored = allSenpai.map(function(s){ return {s:s, score:scoreMatch(s,moyaText,industry,occupation)}; })
-    .sort(function(a,b){ return b.score-a.score; }).slice(0,3);
+
+  btn.disabled = true;
+  btn.textContent = 'マッチング中...';
+
+  var scored = allSenpai
+    .map(function(s) {
+      return {
+        s: s,
+        score: scoreMatch(s, moyaText, industry, occupation)
+      };
+    })
+    .sort(function(a, b) {
+      return b.score - a.score;
+    })
+    .slice(0, 3);
+
   var results = document.getElementById('match-results');
-  results.innerHTML = scored.map(function(item,i){
+
+  results.innerHTML = scored.map(function(item, i) {
     var s = item.s;
-    return '<div class="match-card" id="match-'+i+'">' +
-      '<div class="match-rank">MATCH '+(i+1)+'</div>' +
-      '<h4>「'+(s['タイトル']||'')+'」</h4>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;"><span class="tag">'+(s['年代']||'')+' '+(s['性別']||'')+'</span></div>' +
-      '<div class="match-reason loading" id="reason-'+i+'">マッチング理由を生成中...</div>' +
+    return '<div class="match-card" id="match-' + i + '">' +
+      '<div class="match-rank">MATCH ' + (i + 1) + '</div>' +
+      '<h4>「' + (s['タイトル'] || '') + '」</h4>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;">' +
+        '<span class="tag">' + (s['年代'] || '') + ' ' + (s['性別'] || '') + '</span>' +
+      '</div>' +
+      '<div class="match-reason loading" id="reason-' + i + '">マッチング理由を送信中...</div>' +
     '</div>';
   }).join('');
-  btn.disabled = false; btn.textContent = 'マッチングする';
-  scored.forEach(async function(item, i){
+
+  scored.forEach(async function(item, i) {
     var s = item.s;
+    var el = document.getElementById('reason-' + i);
+
     try {
-      var res = await fetch(GAS_URL, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({action:'generateReason', moyaText:moyaText, industry:industry, occupation:occupation, action2:selectedAction,
-          senpai:{type:s['転機の型']||'', moya:s['モヤモヤタイプ']||'', episode:s['エピソード要約（分析用）']||'', firstStep:s['最初の一手']||'', coachType:s['得意な後輩タイプ']||''}})
+      await fetch(GAS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify({
+          action: 'generateReason',
+          moyaText: moyaText,
+          industry: industry,
+          occupation: occupation,
+          actionStyle: selectedAction,
+          senpai: {
+            type: s['転機の型'] || '',
+            careerType: s['キャリア上昇類型'] || '',
+            moya: s['モヤモヤタイプ'] || '',
+            episode: s['エピソード要約（分析用）'] || '',
+            publicEpisode: s['エピソード要約（公開用）'] || '',
+            firstStep: s['最初の一手'] || '',
+            coachType: s['得意な後輩タイプ'] || '',
+            learning: s['後輩が学べること'] || ''
+          }
+        })
       });
-      var data = await res.json();
-      var el = document.getElementById('reason-'+i);
-      if (el) { el.textContent = data.reason||''; el.classList.remove('loading'); }
-    } catch(e) {
-      var el = document.getElementById('reason-'+i);
-      if (el) { el.textContent = 'この先輩の経験がヒントになるかもしれません。'; el.classList.remove('loading'); }
+
+      if (el) {
+        el.textContent = 'この先輩の経験がヒントになるかもしれません。詳細を開いて「最初の一手」や「後輩が学べること」を見てみてください。';
+        el.classList.remove('loading');
+      }
+
+    } catch (e) {
+      if (el) {
+        el.textContent = '送信に失敗しました。ただし、一覧内の先輩カードから詳細は確認できます。';
+        el.classList.remove('loading');
+      }
     }
   });
+
+  btn.disabled = false;
+  btn.textContent = 'マッチングする';
 }
 
 function openAiAnalysis() {
