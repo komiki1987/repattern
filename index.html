@@ -546,8 +546,7 @@ async function runAiAnalysis() {
   try {
     var res = await fetch(GAS_URL, {
       method: 'POST',
-      redirect: 'follow',
-      headers: {'Content-Type': 'text/plain'},
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         action: 'analyzeDB',
         question: q,
