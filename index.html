@@ -535,7 +535,6 @@ function showAiModal() {
   }).join('');
   openModal('ai-modal');
 }
-
 async function runAiAnalysis() {
   var q = document.getElementById('ai-input').value.trim();
   if (!q) return;
@@ -545,15 +544,12 @@ async function runAiAnalysis() {
     return '['+s['年代']+s['性別']+' '+s['キャリア上昇類型']+'] モヤモヤ='+s['モヤモヤタイプ']+' スタイル='+s['行動スタイルタグ']+' タイトル='+s['タイトル']+' 手放したもの='+s['手放したもの'];
   }).join('\n');
   try {
-    var res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        action: 'analyzeDB',
-        question: q,
-        dbSummary: dbSummary
-      })
-    });
+    var params = encodeURIComponent(JSON.stringify({
+      action: 'analyzeDB',
+      question: q,
+      dbSummary: dbSummary
+    }));
+    var res = await fetch(GAS_URL + '?data=' + params, {redirect: 'follow'});
     var data = await res.json();
     el.textContent = data.result || data.error || 'レスポンスが空です';
   } catch(e) {
