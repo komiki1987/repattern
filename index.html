@@ -274,7 +274,7 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
 </div>
 
 <script>
-var GAS_URL = "https://script.google.com/macros/s/AKfycbzRLPSAX5nhj-p_St8A5n6kLBAXmUp-3RtQctl96Am8z7-odjl8Tn2Ges_TegB8rZUI/exec";
+var GAS_URL = "https://script.google.com/macros/s/AKfycbzHM2I2pi_dD89AzV6aHhsE4Ls2Z8n_n0KsXCTs7Q3jdyedTF6OSHISSi6Y2YuyTvd8/exec";
 var ADMIN_PW = "repattern2025";
 var MATCHING_PW = "repattern2025";
 var CAREER_COLOR = {'機会捕捉型':'#1e2d4a','越境再編集型':'#c8602a','戦略蓄積型':'#b8922a'};
@@ -546,7 +546,8 @@ async function runAiAnalysis() {
   try {
     var res = await fetch(GAS_URL, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      redirect: 'follow',
+      headers: {'Content-Type': 'text/plain'},
       body: JSON.stringify({
         action: 'analyzeDB',
         question: q,
