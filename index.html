@@ -27,7 +27,6 @@ section { padding:64px 24px; }
 hr { border:none; border-top:1px solid var(--c-border); }
 .hero { padding:80px 24px 64px; text-align:center; max-width:720px; margin:0 auto; }
 .hero-label { font-size:12px; letter-spacing:.12em; color:var(--c-gold); text-transform:uppercase; margin-bottom:16px; }
-.hero h1 { font-size:clamp(28px,5vw,42px); font-weight:700; line-height:1.3; margin-bottom:20px; }
 .hero p { font-size:16px; color:var(--c-sub); line-height:1.9; margin-bottom:36px; }
 .hero-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
 .btn { display:inline-block; padding:12px 28px; border-radius:100px; font-size:14px; font-weight:600; cursor:pointer; transition:opacity .2s; border:none; }
@@ -239,7 +238,6 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
   <div style="margin-top:12px;">© 2025 Repattern</div>
 </footer>
 
-<!-- DETAIL MODAL -->
 <div class="modal-overlay" id="detail-modal" onclick="if(event.target===this)closeModal('detail-modal')">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('detail-modal')">✕</button>
@@ -247,7 +245,6 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
   </div>
 </div>
 
-<!-- PW MODAL (AI) -->
 <div class="modal-overlay" id="pw-modal" onclick="if(event.target===this)closeModal('pw-modal')">
   <div class="modal" style="max-width:400px;text-align:center;">
     <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">管理者認証</h3>
@@ -259,7 +256,6 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
   </div>
 </div>
 
-<!-- AI MODAL -->
 <div class="modal-overlay" id="ai-modal" onclick="if(event.target===this)closeModal('ai-modal')">
   <div class="modal" style="max-width:700px;">
     <button class="modal-close" onclick="closeModal('ai-modal')">✕</button>
@@ -417,7 +413,6 @@ function renderStats() {
     '<div class="stat-card"><div class="stat-label">インタビュー数</div><div class="stat-val">'+total+'名</div></div>' +
     '<div class="stat-card"><div class="stat-label">男性 / 女性</div><div class="stat-val">'+male+' / '+female+'</div></div>' +
     '<div class="stat-card"><div class="stat-label">年代スパン</div><div class="stat-val">30〜50代</div></div>';
-
   var charts = [
     {title:'キャリア上昇類型', key:'キャリア上昇類型', split:false},
     {title:'モヤモヤタイプ TOP6', key:'モヤモヤタイプ', split:true, limit:6},
@@ -445,7 +440,6 @@ function renderStats() {
     }).join('');
     bc.appendChild(div);
   });
-
   document.getElementById('summary-text').textContent =
     '現在'+total+'名のせんぱいデータから見えてくる共通のパターンがあります。最も多いモヤモヤは「将来不安型」と「成長停滞型」で、「このままでいいのか」という問いを抱えた転機が多数を占めます。行動スタイルでは「準備してから動く」タイプが最多で、転機は衝動的な決断よりも、違和感を温めながら機会を待ち構えて動いた事例が目立ちます。転機の型では「役割変容型」が最頻出で、劇的な業界転換より、同じ組織や環境の中で役割を広げることで転機を掴んだケースが多いことがわかります。';
 }
@@ -535,6 +529,7 @@ function showAiModal() {
   }).join('');
   openModal('ai-modal');
 }
+
 async function runAiAnalysis() {
   var q = document.getElementById('ai-input').value.trim();
   if (!q) return;
@@ -544,12 +539,8 @@ async function runAiAnalysis() {
     return '['+s['年代']+s['性別']+' '+s['キャリア上昇類型']+'] モヤモヤ='+s['モヤモヤタイプ']+' スタイル='+s['行動スタイルタグ']+' タイトル='+s['タイトル']+' 手放したもの='+s['手放したもの'];
   }).join('\n');
   try {
-    var params = encodeURIComponent(JSON.stringify({
-      action: 'analyzeDB',
-      question: q,
-      dbSummary: dbSummary
-    }));
-    var res = await fetch(GAS_URL + '?data=' + params, {redirect: 'follow'});
+    var url = GAS_URL + '?action=analyzeDB&question=' + encodeURIComponent(q) + '&dbSummary=' + encodeURIComponent(dbSummary);
+    var res = await fetch(url, {redirect: 'follow'});
     var data = await res.json();
     el.textContent = data.result || data.error || 'レスポンスが空です';
   } catch(e) {
