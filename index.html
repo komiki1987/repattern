@@ -27,7 +27,8 @@ section { padding:64px 24px; }
 hr { border:none; border-top:1px solid var(--c-border); }
 .hero { padding:80px 24px 64px; text-align:center; max-width:720px; margin:0 auto; }
 .hero-label { font-size:12px; letter-spacing:.12em; color:var(--c-gold); text-transform:uppercase; margin-bottom:16px; }
-.hero p { font-size:16px; color:var(--c-sub); line-height:1.9; margin-bottom:36px; }
+.hero-main {font-size:16px; color:var(--c-sub); line-height:1.9; margin-bottom:20px; }
+.hero-sub { font-size:13px; color:var(--c-sub); line-height:1.8; opacity:0.85; margin-bottom:36px;}
 .hero-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
 .btn { display:inline-block; padding:12px 28px; border-radius:100px; font-size:14px; font-weight:600; cursor:pointer; transition:opacity .2s; border:none; }
 .btn-primary { background:var(--c-accent); color:var(--c-cream); }
@@ -130,7 +131,16 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
     <div style="font-size:clamp(40px,8vw,72px);font-weight:700;letter-spacing:.06em;color:var(--c-accent);line-height:1;margin-bottom:10px;">Repattern</div>
     <div style="font-size:clamp(16px,2.5vw,22px);font-weight:700;color:var(--c-accent2);letter-spacing:.04em;">キャリアの転機を、型にする。</div>
   </div>
-  <p>悩んでいるのはあなただけじゃない。<br>先を歩いた人の「転機の型」が、次の一歩を照らす。</p>
+  <p class="hero-main">
+  悩んでいるのはあなただけじゃない。<br>
+  先を歩いた人の「転機の型」が、次の一歩を照らす。
+</p>
+
+<p class="hero-sub">
+  Repatternは、<br>
+  キャリアの迷いや転機を記録し、<br>
+  次の誰かへつないでいく個人プロジェクトです。
+</p>
   <div class="hero-btns">
     <button class="btn btn-primary" onclick="scrollToId('matching')">マッチングを試す</button>
     <button class="btn btn-outline" onclick="scrollToId('senpai')">せんぱいを見る</button>
