@@ -17,8 +17,12 @@ body { font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif; backgr
 a { color:inherit; text-decoration:none; }
 nav { position:sticky; top:0; z-index:100; background:var(--c-accent); border-bottom:3px solid var(--c-gold); padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:56px; }
 .nav-logo { font-size:16px; font-weight:700; letter-spacing:.06em; color:var(--c-cream); }
+.nav-right { display:flex; align-items:center; gap:24px; }
 .nav-links { display:flex; gap:24px; font-size:13px; color:var(--c-sand); }
 .nav-links a:hover { color:var(--c-cream); }
+.lang-toggle { display:flex; align-items:center; border:1.5px solid var(--c-gold); border-radius:100px; overflow:hidden; flex-shrink:0; }
+.lang-toggle button { border:none; background:transparent; color:var(--c-sand); font-size:11px; font-weight:700; letter-spacing:.05em; padding:5px 12px; cursor:pointer; transition:all .15s; }
+.lang-toggle button.active { background:var(--c-gold); color:var(--c-accent); }
 section { padding:64px 24px; }
 .inner { max-width:960px; margin:0 auto; }
 .s-label { font-size:11px; letter-spacing:.14em; color:var(--c-gold); text-transform:uppercase; margin-bottom:8px; }
@@ -101,7 +105,7 @@ input[type=text]:focus, input[type=password]:focus { outline:2px solid var(--c-a
 .m-sec p { font-size:14px; line-height:1.9; color:var(--c-sub); }
 .m-quote { background:var(--c-cream); border-left:3px solid var(--c-gold); padding:14px 16px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-size:14px; font-style:italic; color:var(--c-text); margin-bottom:20px; }
 .m-step { background:#eef0f5; border-radius:var(--radius-sm); padding:14px 16px; font-size:14px; color:var(--c-accent); margin-bottom:20px; }
-.m-step::before { content:"最初の一手 → "; font-weight:700; }
+.m-step b { font-weight:700; }
 .pw-box { background:var(--c-white); border:1px solid var(--c-border); border-radius:var(--radius); padding:40px 24px; text-align:center; }
 .pw-box h3 { font-size:18px; font-weight:700; margin-bottom:8px; }
 .pw-box p { font-size:13px; color:var(--c-sub); margin-bottom:24px; }
@@ -110,18 +114,23 @@ input[type=text]:focus, input[type=password]:focus { outline:2px solid var(--c-a
 .ai-presets { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
 footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub); border-top:1px solid var(--c-border); }
 #senpai-loading { text-align:center; padding:48px; color:var(--c-sub); font-size:14px; }
-@media (max-width:600px) { .nav-links { display:none; } }
+@media (max-width:640px) { .nav-links { display:none; } }
 </style>
 </head>
 <body>
 
 <nav>
   <div class="nav-logo">Repattern</div>
-  <div class="nav-links">
-    <a href="#concept">コンセプト</a>
-    <a href="#stats">データ</a>
-    <a href="#senpai">せんぱい一覧</a>
-    <a href="#matching">マッチング</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="#concept" data-i18n="navConcept">コンセプト</a>
+      <a href="#stats" data-i18n="navData">データ</a>
+      <a href="#senpai" data-i18n="navSenpai">せんぱい一覧</a>
+    </div>
+    <div class="lang-toggle">
+      <button id="lang-ja-btn" class="active" onclick="setLang('ja')">日本語</button>
+      <button id="lang-en-btn" onclick="setLang('en')">EN</button>
+    </div>
   </div>
 </nav>
 
@@ -129,19 +138,18 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
   <div class="hero-label">Career Pattern Lab</div>
   <div style="margin-bottom:28px;">
     <div style="font-size:clamp(40px,8vw,72px);font-weight:700;letter-spacing:.06em;color:var(--c-accent);line-height:1;margin-bottom:10px;">Repattern</div>
-    <div style="font-size:clamp(16px,2.5vw,22px);font-weight:700;color:var(--c-accent2);letter-spacing:.04em;">キャリアの転機を、型にする。</div>
+    <div style="font-size:clamp(16px,2.5vw,22px);font-weight:700;color:var(--c-accent2);letter-spacing:.04em;" data-i18n="heroTag">キャリアの転機を、型にする。</div>
   </div>
-  <p class="hero-main">
+  <p class="hero-main" data-i18n-html="heroMain">
   悩んでいるのはあなただけじゃない。<br>
   先を歩いた人の「転機の型」が、次の一歩を照らす。
 </p>
 
-<p class="hero-sub">
+<p class="hero-sub" data-i18n-html="heroSub">
   Repatternは、キャリアの迷いや転機を記録し、次の誰かへつないでいく個人プロジェクトです。
 </p>
   <div class="hero-btns">
-    <button class="btn btn-primary" onclick="scrollToId('matching')">マッチングを試す</button>
-    <button class="btn btn-outline" onclick="scrollToId('senpai')">せんぱいを見る</button>
+    <button class="btn btn-primary" onclick="scrollToId('senpai')" data-i18n="btnViewSenpai">せんぱいを見る</button>
   </div>
 </section>
 <hr>
@@ -149,28 +157,27 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
 <section id="concept" style="background:var(--c-white);">
   <div class="inner">
     <div class="s-label">Concept</div>
-    <div class="s-title">なぜ Repattern なのか</div>
-    <div class="s-desc">キャリアの悩みは、答えを急ぐより「似た転機を経た人の話」を聞くことで、動き出せることがある。</div>
+    <div class="s-title" data-i18n="conceptTitle">なぜ Repattern なのか</div>
+    <div class="s-desc" data-i18n="conceptDesc">キャリアの悩みは、答えを急ぐより「似た転機を経た人の話」を聞くことで、動き出せることがある。</div>
     <div class="concept-grid">
-      <div class="concept-card"><div class="concept-num">01</div><div><h3>転機には「型」がある</h3><p>一見バラバラに見えるキャリアの変化も、パターンに分類できる。あなたのモヤモヤに近い型を持つ先輩が、必ずいる。</p></div></div>
-      <div class="concept-card"><div class="concept-num">02</div><div><h3>しくじりも資産になる</h3><p>成功談だけでなく、失敗・割り切り・本音のしんどさまで共有する。だから、リアルな参考になる。</p></div></div>
-      <div class="concept-card"><div class="concept-num">03</div><div><h3>受け取ったものを返す</h3><p>先輩が後輩へ、後輩がまた次の世代へ。キャリアの知恵を循環させるプラットフォームを目指す。</p></div></div>
+      <div class="concept-card"><div class="concept-num">01</div><div><h3 data-i18n="concept1Title">転機には「型」がある</h3><p data-i18n="concept1Body">一見バラバラに見えるキャリアの変化も、パターンに分類できる。あなたのモヤモヤに近い型を持つ先輩が、必ずいる。</p></div></div>
+      <div class="concept-card"><div class="concept-num">02</div><div><h3 data-i18n="concept2Title">しくじりも資産になる</h3><p data-i18n="concept2Body">成功談だけでなく、失敗・割り切り・本音のしんどさまで共有する。だから、リアルな参考になる。</p></div></div>
+      <div class="concept-card"><div class="concept-num">03</div><div><h3 data-i18n="concept3Title">受け取ったものを返す</h3><p data-i18n="concept3Body">先輩が後輩へ、後輩がまた次の世代へ。キャリアの知恵を循環させるプラットフォームを目指す。</p></div></div>
     </div>
   </div>
 </section>
 <hr>
 
+<hr>
+
 <section id="stats">
   <div class="inner">
     <div class="s-label">Data</div>
-    <div class="s-title">せんぱいDB の傾向</div>
-    <div class="s-desc">インタビューデータから見えてくるキャリア転機のパターン。</div>
-    <div class="summary-box"><p id="summary-text">データを読み込み中...</p></div>
+    <div class="s-title" data-i18n="statsTitle">せんぱいDB の傾向</div>
+    <div class="s-desc" data-i18n="statsDesc">インタビューデータから見えてくるキャリア転機のパターン。</div>
+    <div class="summary-box"><p id="summary-text" data-i18n="senpaiLoading">データを読み込み中...</p></div>
     <div class="stats-grid" id="stats-grid"></div>
     <div class="bar-charts" id="bar-charts"></div>
-    <div style="margin-top:32px;text-align:center;">
-      <button class="btn btn-outline" onclick="openAiAnalysis()">AI深掘り分析（管理者用）</button>
-    </div>
   </div>
 </section>
 <hr>
@@ -178,72 +185,27 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
 <section id="senpai" style="background:var(--c-white);">
   <div class="inner">
     <div class="s-label">Senpai Database</div>
-    <div class="s-title">せんぱい一覧</div>
-    <div class="s-desc">実際のキャリア転機を語ってくれた先輩たちのストーリー。</div>
+    <div class="s-title" data-i18n="senpaiTitle">せんぱい一覧</div>
+    <div class="s-desc" data-i18n="senpaiDesc">実際のキャリア転機を語ってくれた先輩たちのストーリー。</div>
     <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#1e2d4a;"></div>機会捕捉型</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#c8602a;"></div>越境再編集型</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#b8922a;"></div>戦略蓄積型</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1e2d4a;"></div><span data-i18n="legend1">機会捕捉型</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#c8602a;"></div><span data-i18n="legend2">越境再編集型</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#b8922a;"></div><span data-i18n="legend3">戦略蓄積型</span></div>
     </div>
     <div class="filter-bar" id="filter-bar">
-      <button class="filter-btn active" onclick="applyFilter('all',this)">すべて</button>
+      <button class="filter-btn active" onclick="applyFilter('all',this)" data-i18n="filterAll">すべて</button>
     </div>
-    <div id="senpai-loading">データを読み込み中...</div>
+    <div id="senpai-loading" data-i18n="senpaiLoading">データを読み込み中...</div>
     <div class="senpai-grid" id="senpai-grid" style="display:none;"></div>
-    <button class="more-btn" id="more-btn" style="display:none;" onclick="showMore()">もっと見る</button>
+    <button class="more-btn" id="more-btn" style="display:none;" onclick="showMore()" data-i18n="moreBtn">もっと見る</button>
   </div>
 </section>
 <hr>
 
-<section id="matching">
-  <div class="inner">
-    <div class="s-label">Matching</div>
-    <div class="s-title">あなたにマッチする先輩を探す</div>
-    <div class="s-desc">今のモヤモヤを入力すると、似た転機を経験した先輩を3名提案します。</div>
-    <div id="matching-lock" class="pw-box">
-      <div style="font-size:32px;margin-bottom:16px;">🔒</div>
-      <h3>マッチング機能を使うにはパスワードが必要です</h3>
-      <p>サービス利用者の方はパスワードを入力してください。</p>
-      <div class="pw-row">
-        <input type="password" id="matching-pw-input" placeholder="パスワードを入力" onkeydown="if(event.key==='Enter')checkMatchingPw()">
-        <button class="btn btn-primary" onclick="checkMatchingPw()" style="white-space:nowrap;padding:10px 20px;">解錠</button>
-      </div>
-      <div class="pw-error" id="matching-pw-error"></div>
-    </div>
-    <div id="matching-body" style="display:none;">
-      <div class="matching-steps">
-        <div class="step-card">
-          <div class="step-num">STEP 01</div>
-          <h3>今のモヤモヤを教えてください</h3>
-          <textarea id="moya-text" placeholder="例）今の仕事で成果は出ているけど、このまま年次を重ねていくことへの焦りがある。次に何をすべきかわからない。"></textarea>
-        </div>
-        <div class="step-card">
-          <div class="step-num">STEP 02</div>
-          <h3>あなたのプロフィール（任意）</h3>
-          <div style="display:grid;gap:10px;">
-            <input type="text" id="match-industry" placeholder="業界（例：IT、人材、金融）">
-            <input type="text" id="match-occupation" placeholder="職種（例：営業、企画、エンジニア）">
-          </div>
-          <div style="margin-top:14px;">
-            <div style="font-size:13px;color:var(--c-sub);margin-bottom:6px;">行動スタイル</div>
-            <div class="radio-group" id="action-style-group">
-              <div class="radio-btn" data-val="見切り発車型">見切り発車型</div>
-              <div class="radio-btn" data-val="準備してから動く">準備してから動く</div>
-              <div class="radio-btn" data-val="内省しながら変化">内省しながら変化</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <button class="match-run-btn" id="match-btn" onclick="runMatching()">マッチングする</button>
-      <div id="match-results" style="display:grid;gap:14px;margin-top:28px;"></div>
-    </div>
-  </div>
-</section>
-
 <section id="about" style="background:var(--c-white);">
   <div class="inner">
     <div class="s-label">About</div>
-    <div class="s-title">プロフィール</div>
+    <div class="s-title" data-i18n="aboutTitle">プロフィール</div>
     <div style="display:flex;flex-direction:column;gap:20px;">
       <div style="display:flex;align-items:center;gap:16px;">
         <div style="width:56px;height:56px;border-radius:50%;background:var(--c-accent);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--c-cream);flex-shrink:0;">MY</div>
@@ -252,7 +214,7 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
           <div style="font-size:13px;color:var(--c-sub);">人材業界 / DX推進</div>
         </div>
       </div>
-      <p style="font-size:14px;color:var(--c-sub);line-height:2;">
+      <p style="font-size:14px;color:var(--c-sub);line-height:2;" data-i18n-html="aboutBio">
         人材業界でDX推進の仕事をしながら、個人で「Repattern」というプロジェクトを続けています。<br><br>
         キャリアの迷いや転機には、誰かの実例が支えになることがある。<br>
         そんな経験を、次の世代へつないでいけたらと思っています。<br><br>
@@ -274,7 +236,7 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
   
 <footer>
   <div style="font-weight:700;font-size:14px;margin-bottom:6px;">Repattern</div>
-  <div>キャリアの転機を、型にする。</div>
+  <div data-i18n="footerTag">キャリアの転機を、型にする。</div>
   <div style="margin-top:12px;">© 2025 Repattern</div>
 </footer>
 
@@ -285,77 +247,155 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
   </div>
 </div>
 
-<div class="modal-overlay" id="pw-modal" onclick="if(event.target===this)closeModal('pw-modal')">
-  <div class="modal" style="max-width:400px;text-align:center;">
-    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">管理者認証</h3>
-    <p style="font-size:13px;color:var(--c-sub);margin-bottom:20px;">AI深掘り分析はRepattern管理者専用です。</p>
-    <input type="password" id="pw-input" placeholder="パスワードを入力" style="text-align:center;letter-spacing:.2em;margin-bottom:12px;" onkeydown="if(event.key==='Enter')checkPw()">
-    <button class="btn btn-primary" onclick="checkPw()" style="width:100%;padding:12px;">認証する</button>
-    <div class="pw-error" id="pw-error"></div>
-    <div style="margin-top:12px;"><button style="background:none;border:none;color:var(--c-sub);font-size:13px;cursor:pointer;" onclick="closeModal('pw-modal')">キャンセル</button></div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="ai-modal" onclick="if(event.target===this)closeModal('ai-modal')">
-  <div class="modal" style="max-width:700px;">
-    <button class="modal-close" onclick="closeModal('ai-modal')">✕</button>
-    <div style="font-size:18px;font-weight:700;margin-bottom:16px;">AI深掘り分析</div>
-    <div class="ai-presets" id="ai-presets"></div>
-    <div style="display:flex;gap:8px;margin-bottom:16px;">
-      <input type="text" id="ai-input" placeholder="分析したいことを自由に入力...">
-      <button class="btn btn-primary" onclick="runAiAnalysis()" style="white-space:nowrap;padding:10px 20px;">分析</button>
-    </div>
-    <div id="ai-result" style="font-size:14px;line-height:1.9;color:var(--c-sub);white-space:pre-wrap;min-height:80px;"></div>
-  </div>
-</div>
-
 <script>
 var GAS_URL = "https://script.google.com/macros/s/AKfycbzRLPSAX5nhj-p_St8A5n6kLBAXmUp-3RtQctl96Am8z7-odjl8Tn2Ges_TegB8rZUI/exec";
-var ADMIN_PW = "repattern2025";
-var MATCHING_PW = "repattern2025";
 var CAREER_COLOR = {'機会捕捉型':'#1e2d4a','越境再編集型':'#c8602a','戦略蓄積型':'#b8922a'};
-var AI_PRESETS = [
-  '「手放したもの」に共通する心理的パターンを分析して',
-  '転機トリガーが外発か内発かで分類し、行動スタイルとの相関を見て',
-  '行動スタイル別の転機パターンの違いを教えて',
-  'コーハイへのマッチング精度を上げるために重要な軸を提案して',
-  'このDBから見える「転機に必要な心理的コスト」をまとめて'
-];
+
+/* ---------- i18n ---------- */
+var I18N = {
+  ja: {
+    navConcept:'コンセプト', navData:'データ', navSenpai:'せんぱい一覧', navMatching:'マッチング',
+    heroTag:'キャリアの転機を、型にする。',
+    heroMain:'悩んでいるのはあなただけじゃない。<br>先を歩いた人の「転機の型」が、次の一歩を照らす。',
+    heroSub:'Repatternは、キャリアの迷いや転機を記録し、次の誰かへつないでいく個人プロジェクトです。',
+    btnTryMatching:'マッチングを試す', btnViewSenpai:'せんぱいを見る',
+    conceptTitle:'なぜ Repattern なのか',
+    conceptDesc:'キャリアの悩みは、答えを急ぐより「似た転機を経た人の話」を聞くことで、動き出せることがある。',
+    concept1Title:'転機には「型」がある',
+    concept1Body:'一見バラバラに見えるキャリアの変化も、パターンに分類できる。あなたのモヤモヤに近い型を持つ先輩が、必ずいる。',
+    concept2Title:'しくじりも資産になる',
+    concept2Body:'成功談だけでなく、失敗・割り切り・本音のしんどさまで共有する。だから、リアルな参考になる。',
+    concept3Title:'受け取ったものを返す',
+    concept3Body:'先輩が後輩へ、後輩がまた次の世代へ。キャリアの知恵を循環させるプラットフォームを目指す。',
+    statsTitle:'せんぱいDB の傾向', statsDesc:'インタビューデータから見えてくるキャリア転機のパターン。',
+    aiBtn:'AI深掘り分析（管理者用）',
+    statInterviews:'インタビュー数', statGender:'男性 / 女性', statAge:'年代スパン', statAgeVal:'30〜50代',
+    chartCareer:'キャリア上昇類型', chartMoya:'モヤモヤタイプ TOP6', chartAction:'行動スタイル',
+    senpaiTitle:'せんぱい一覧', senpaiDesc:'実際のキャリア転機を語ってくれた先輩たちのストーリー。',
+    legend1:'機会捕捉型', legend2:'越境再編集型', legend3:'戦略蓄積型',
+    filterAll:'すべて', senpaiLoading:'データを読み込み中...', senpaiLoadError:'データの読み込みに失敗しました。', moreBtn:'もっと見る',
+    cardMoya:'モヤモヤ', cardIndustry:'経験業界', cardOccupation:'経験職種',
+    matchingTitle:'あなたにマッチする先輩を探す', matchingDesc:'今のモヤモヤを入力すると、似た転機を経験した先輩を3名提案します。',
+    lockTitle:'マッチング機能を使うにはパスワードが必要です', lockDesc:'サービス利用者の方はパスワードを入力してください。',
+    pwPlaceholder:'パスワードを入力', unlockBtn:'解錠', pwError:'パスワードが正しくありません',
+    step1Title:'今のモヤモヤを教えてください',
+    moyaPlaceholder:'例）今の仕事で成果は出ているけど、このまま年次を重ねていくことへの焦りがある。次に何をすべきかわからない。',
+    step2Title:'あなたのプロフィール（任意）', industryPlaceholder:'業界（例：IT、人材、金融）', occupationPlaceholder:'職種（例：営業、企画、エンジニア）',
+    actionStyleLabel:'行動スタイル',
+    action1:'見切り発車型', action2:'準備してから動く', action3:'内省しながら変化',
+    matchBtn:'マッチングする', matchBtnLoading:'マッチング中...',
+    matchAlert:'モヤモヤを入力してください',
+    matchRank:'MATCH', reasonLoading:'マッチング理由を生成中...', reasonFallback:'この先輩の経験がヒントになるかもしれません。',
+    aboutTitle:'プロフィール',
+    aboutBio:'人材業界でDX推進の仕事をしながら、個人で「Repattern」というプロジェクトを続けています。<br><br>キャリアの迷いや転機には、誰かの実例が支えになることがある。<br>そんな経験を、次の世代へつないでいけたらと思っています。<br><br>AIを使いながら、人のキャリア理解を深める実験もゆるやかに続けています。',
+    footerTag:'キャリアの転機を、型にする。',
+    adminAuthTitle:'管理者認証', adminAuthDesc:'AI深掘り分析はRepattern管理者専用です。', adminPwPlaceholder:'パスワードを入力', adminAuthBtn:'認証する', adminCancelBtn:'キャンセル',
+    modalEpisode:'エピソード', modalLetGo:'手放したもの', modalGrowth:'成長加速ポイント', modalLearn:'後輩が学べること', modalFirstStep:'最初の一手'
+  },
+  en: {
+    navConcept:'Concept', navData:'Data', navSenpai:'Senpai', navMatching:'Matching',
+    heroTag:'Turning career turning points into patterns.',
+    heroMain:"You're not the only one struggling.<br>The patterns of those who walked before you can light the next step.",
+    heroSub:'Repattern is an independent project that records career doubts and turning points, and passes them on to whoever needs them next.',
+    btnTryMatching:'Try Matching', btnViewSenpai:'View Senpai',
+    conceptTitle:'Why Repattern',
+    conceptDesc:'Career worries often move forward not by rushing to an answer, but by hearing the story of someone who lived through a similar turning point.',
+    concept1Title:'Turning points follow patterns',
+    concept1Body:'Career changes that seem random can be sorted into patterns. There is always a senpai whose pattern is close to your own doubt.',
+    concept2Title:'Even missteps become an asset',
+    concept2Body:'Not just success stories — failures, compromises, and honest struggles are shared too, making it a real reference point.',
+    concept3Title:'Pass on what you received',
+    concept3Body:'From senpai to kohai, and from kohai to the next generation — a platform for circulating career wisdom.',
+    statsTitle:'Trends in the Senpai Database', statsDesc:'Patterns of career turning points revealed through interview data.',
+    aiBtn:'AI Deep Analysis (Admin)',
+    statInterviews:'Interviews', statGender:'Male / Female', statAge:'Age Range', statAgeVal:'30s–50s',
+    chartCareer:'Career Pattern Type', chartMoya:'Top 6 Concern Types', chartAction:'Action Style',
+    senpaiTitle:'Senpai Directory', senpaiDesc:'Stories from senpai who shared their real career turning points.',
+    legend1:'Opportunity Capture', legend2:'Boundary Re-editing', legend3:'Strategic Accumulation',
+    filterAll:'All', senpaiLoading:'Loading data...', senpaiLoadError:'Failed to load data.', moreBtn:'Show more',
+    cardMoya:'Concerns', cardIndustry:'Industries', cardOccupation:'Roles',
+    matchingTitle:'Find Your Matching Senpai',
+    matchingDesc:"Enter what's on your mind, and we'll suggest three senpai who went through a similar turning point.",
+    lockTitle:'A password is required to use the matching feature', lockDesc:'If you are a service user, please enter the password.',
+    pwPlaceholder:'Enter password', unlockBtn:'Unlock', pwError:'Incorrect password',
+    step1Title:"Tell us what's on your mind",
+    moyaPlaceholder:"e.g. I'm getting results at work, but I feel anxious just accumulating years without knowing what to do next.",
+    step2Title:'Your profile (optional)', industryPlaceholder:'Industry (e.g. IT, staffing, finance)', occupationPlaceholder:'Role (e.g. sales, planning, engineer)',
+    actionStyleLabel:'Action Style',
+    action1:'Leap first', action2:'Prepare then move', action3:'Reflect then change',
+    matchBtn:'Run Matching', matchBtnLoading:'Matching...',
+    matchAlert:"Please enter what's on your mind",
+    matchRank:'MATCH', reasonLoading:'Generating match reason...', reasonFallback:"This senpai's experience might offer a helpful hint.",
+    aboutTitle:'Profile',
+    aboutBio:'While working on DX promotion in the staffing industry, I run an independent project called "Repattern."<br><br>In moments of career doubt or transition, someone else\'s real example can be a source of support.<br>I hope to pass that kind of experience on to the next generation.<br><br>Alongside this, I\'m quietly experimenting with AI to deepen how we understand people\'s careers.',
+    footerTag:'Turning career turning points into patterns.',
+    adminAuthTitle:'Admin Authentication', adminAuthDesc:'AI Deep Analysis is for Repattern admin use only.', adminPwPlaceholder:'Enter password', adminAuthBtn:'Authenticate', adminCancelBtn:'Cancel',
+    modalEpisode:'Episode', modalLetGo:'What They Let Go Of', modalGrowth:'Growth Accelerator', modalLearn:'What Kohai Can Learn', modalFirstStep:'First Step'
+  }
+};
+var currentLang = 'ja';
+
+function t(key) { return I18N[currentLang][key] || I18N.ja[key] || ''; }
+
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.getElementById('lang-ja-btn').classList.toggle('active', lang==='ja');
+  document.getElementById('lang-en-btn').classList.toggle('active', lang==='en');
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    el.textContent = t(el.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el){
+    el.innerHTML = t(el.dataset.i18nHtml);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el){
+    el.placeholder = t(el.dataset.i18nPlaceholder);
+  });
+  if (allSenpai.length) { showing = 3; loadData(lang); }
+}
+
 var allSenpai = [];
 var showing = 3;
 var currentFilter = 'all';
-var selectedAction = '';
-var aiUnlocked = false;
 
 function scrollToId(id) { document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
 function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
 
-function checkMatchingPw() {
-  if (document.getElementById('matching-pw-input').value === MATCHING_PW) {
-    document.getElementById('matching-lock').style.display = 'none';
-    document.getElementById('matching-body').style.display = 'block';
-  } else {
-    document.getElementById('matching-pw-error').textContent = 'パスワードが正しくありません';
-  }
-}
+var senpaiCache = {}; // { ja: [...], en: [...] }
 
-async function loadData() {
+async function loadData(lang) {
+  lang = lang || 'ja';
+  if (senpaiCache[lang]) {
+    allSenpai = senpaiCache[lang];
+    renderFilters();
+    renderSenpai();
+    renderStats();
+    return;
+  }
+  var loading = document.getElementById('senpai-loading');
+  var grid = document.getElementById('senpai-grid');
+  loading.textContent = t('senpaiLoading');
+  loading.style.display = 'block';
+  grid.style.display = 'none';
   try {
-    var res = await fetch(GAS_URL, {redirect:'follow'});
+    var res = await fetch(GAS_URL + '?lang=' + encodeURIComponent(lang), {redirect:'follow'});
     var data = await res.json();
-    allSenpai = Array.isArray(data) ? data : [];
+    var list = Array.isArray(data) ? data : [];
+    senpaiCache[lang] = list;
+    allSenpai = list;
     renderFilters();
     renderSenpai();
     renderStats();
   } catch(e) {
-    document.getElementById('senpai-loading').textContent = 'データの読み込みに失敗しました。';
+    document.getElementById('senpai-loading').textContent = t('senpaiLoadError');
   }
 }
 
 function renderFilters() {
   var types = [...new Set(allSenpai.map(function(s){ return s['キャリア上昇類型']; }).filter(Boolean))];
   var bar = document.getElementById('filter-bar');
+  bar.querySelectorAll('button:not([data-i18n="filterAll"])').forEach(function(b){ b.remove(); });
   types.forEach(function(t) {
     var btn = document.createElement('button');
     btn.className = 'filter-btn';
@@ -406,9 +446,9 @@ function renderSenpai() {
       '<div class="card-title">「'+(s['タイトル']||'')+'」</div>' +
       '<div class="card-quote">'+(s['転機の一言']||'')+'</div>' +
       '<div style="display:flex;flex-direction:column;gap:6px;">' +
-        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-size:10px;color:var(--c-sub);flex-shrink:0;">モヤモヤ</span>'+moyaTags+'</div>' +
-        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-size:10px;color:var(--c-sub);flex-shrink:0;">経験業界</span>'+indTags+'</div>' +
-        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-size:10px;color:var(--c-sub);flex-shrink:0;">経験職種</span>'+occTags+'</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-size:10px;color:var(--c-sub);flex-shrink:0;">'+t('cardMoya')+'</span>'+moyaTags+'</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-size:10px;color:var(--c-sub);flex-shrink:0;">'+t('cardIndustry')+'</span>'+indTags+'</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-size:10px;color:var(--c-sub);flex-shrink:0;">'+t('cardOccupation')+'</span>'+occTags+'</div>' +
       '</div>';
     card.onclick = function(){ openDetail(s); };
     grid.appendChild(card);
@@ -436,11 +476,11 @@ function openDetail(s) {
     '<div class="m-quote">'+(s['転機の一言']||'')+'</div>' +
     '<div class="m-sub">'+(s['キャリア上昇類型']||'')+' / '+(s['行動スタイルタグ']||'')+'</div>' +
     '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;">'+moyaTags+'</div>' +
-    '<div class="m-sec"><div class="m-sec-label">エピソード</div><p>'+(s['エピソード要約（公開用）']||'').replace(/\n/g,'<br>')+'</p></div>' +
-    '<div class="m-sec"><div class="m-sec-label">手放したもの</div><p>'+(s['手放したもの']||'—').replace(/\n/g,'<br>')+'</p></div>' +
-    '<div class="m-sec"><div class="m-sec-label">成長加速ポイント</div><p>'+(s['成長加速ポイント']||'—').replace(/\n/g,'<br>')+'</p></div>' +
-    '<div class="m-sec"><div class="m-sec-label">後輩が学べること</div><p>'+(s['後輩が学べること']||'—').replace(/\n/g,'<br>')+'</p></div>' +
-    '<div class="m-step">'+(s['最初の一手']||'—')+'</div>' +
+    '<div class="m-sec"><div class="m-sec-label">'+t('modalEpisode')+'</div><p>'+(s['エピソード要約（公開用）']||'').replace(/\n/g,'<br>')+'</p></div>' +
+    '<div class="m-sec"><div class="m-sec-label">'+t('modalLetGo')+'</div><p>'+(s['手放したもの']||'—').replace(/\n/g,'<br>')+'</p></div>' +
+    '<div class="m-sec"><div class="m-sec-label">'+t('modalGrowth')+'</div><p>'+(s['成長加速ポイント']||'—').replace(/\n/g,'<br>')+'</p></div>' +
+    '<div class="m-sec"><div class="m-sec-label">'+t('modalLearn')+'</div><p>'+(s['後輩が学べること']||'—').replace(/\n/g,'<br>')+'</p></div>' +
+    '<div class="m-step"><b>'+t('modalFirstStep')+' → </b>'+(s['最初の一手']||'—')+'</div>' +
     '<div style="display:flex;flex-wrap:wrap;gap:6px;">'+kohaiTags+'</div>';
   openModal('detail-modal');
 }
@@ -450,13 +490,13 @@ function renderStats() {
   var female = allSenpai.filter(function(s){ return s['性別']==='女性'; }).length;
   var male = allSenpai.filter(function(s){ return s['性別']==='男性'; }).length;
   document.getElementById('stats-grid').innerHTML =
-    '<div class="stat-card"><div class="stat-label">インタビュー数</div><div class="stat-val">'+total+'名</div></div>' +
-    '<div class="stat-card"><div class="stat-label">男性 / 女性</div><div class="stat-val">'+male+' / '+female+'</div></div>' +
-    '<div class="stat-card"><div class="stat-label">年代スパン</div><div class="stat-val">30〜50代</div></div>';
+    '<div class="stat-card"><div class="stat-label">'+t('statInterviews')+'</div><div class="stat-val">'+total+(currentLang==='ja'?'名':'')+'</div></div>' +
+    '<div class="stat-card"><div class="stat-label">'+t('statGender')+'</div><div class="stat-val">'+male+' / '+female+'</div></div>' +
+    '<div class="stat-card"><div class="stat-label">'+t('statAge')+'</div><div class="stat-val">'+t('statAgeVal')+'</div></div>';
   var charts = [
-    {title:'キャリア上昇類型', key:'キャリア上昇類型', split:false},
-    {title:'モヤモヤタイプ TOP6', key:'モヤモヤタイプ', split:true, limit:6},
-    {title:'行動スタイル', key:'行動スタイルタグ', split:false}
+    {title:t('chartCareer'), key:'キャリア上昇類型', split:false},
+    {title:t('chartMoya'), key:'モヤモヤタイプ', split:true, limit:6},
+    {title:t('chartAction'), key:'行動スタイルタグ', split:false}
   ];
   var bc = document.getElementById('bar-charts');
   bc.innerHTML = '';
@@ -481,115 +521,12 @@ function renderStats() {
     bc.appendChild(div);
   });
   document.getElementById('summary-text').textContent =
-    '現在'+total+'名のせんぱいデータから見えてくる共通のパターンがあります。最も多いモヤモヤは「将来不安型」と「成長停滞型」で、「このままでいいのか」という問いを抱えた転機が多数を占めます。行動スタイルでは「準備してから動く」タイプが最多で、転機は衝動的な決断よりも、違和感を温めながら機会を待ち構えて動いた事例が目立ちます。転機の型では「役割変容型」が最頻出で、劇的な業界転換より、同じ組織や環境の中で役割を広げることで転機を掴んだケースが多いことがわかります。';
+    currentLang === 'ja'
+    ? ('現在'+total+'名のせんぱいデータから見えてくる共通のパターンがあります。最も多いモヤモヤは「将来不安型」と「成長停滞型」で、「このままでいいのか」という問いを抱えた転機が多数を占めます。行動スタイルでは「準備してから動く」タイプが最多で、転機は衝動的な決断よりも、違和感を温めながら機会を待ち構えて動いた事例が目立ちます。転機の型では「役割変容型」が最頻出で、劇的な業界転換より、同じ組織や環境の中で役割を広げることで転機を掴んだケースが多いことがわかります。')
+    : ('Common patterns emerge from the current '+total+' senpai in the database. The most frequent concerns are "future anxiety" and "growth stagnation" — turning points shaped by the question "is it okay to keep going like this?" The most common action style is "prepare then move," suggesting that turning points tend to come less from impulsive decisions and more from sitting with discomfort while waiting for the right opportunity. The most frequent pattern type is "role transformation" — turning points reached more often by expanding one\'s role within the same organization than by a dramatic industry switch.');
 }
 
-document.querySelectorAll('#action-style-group .radio-btn').forEach(function(btn){
-  btn.onclick = function(){
-    document.querySelectorAll('#action-style-group .radio-btn').forEach(function(b){ b.classList.remove('selected'); });
-    btn.classList.add('selected');
-    selectedAction = btn.dataset.val;
-  };
-});
-
-function scoreMatch(s, moyaText, industry, occupation) {
-  var score = 0;
-  var moya = s['モヤモヤタイプ']||'';
-  var kohai = s['得意な後輩タイプ']||'';
-  var ep = (s['エピソード要約（分析用）']||'')+(s['後輩が学べること']||'');
-  moyaText.split(/[\s、。,]/).forEach(function(w){
-    if (w.length > 1) {
-      if (moya.includes(w)) score+=3;
-      if (kohai.includes(w)) score+=2;
-      if (ep.includes(w)) score+=1;
-    }
-  });
-  if (industry && (s['経験業界タグ']||'').includes(industry)) score+=2;
-  if (occupation && (s['経験職種タグ']||'').includes(occupation)) score+=2;
-  if (selectedAction && (s['行動スタイルタグ']||'').includes(selectedAction)) score+=2;
-  return score;
-}
-
-async function runMatching() {
-  var moyaText = document.getElementById('moya-text').value.trim();
-  if (!moyaText) { alert('モヤモヤを入力してください'); return; }
-  var industry = document.getElementById('match-industry').value.trim();
-  var occupation = document.getElementById('match-occupation').value.trim();
-  var btn = document.getElementById('match-btn');
-  btn.disabled = true; btn.textContent = 'マッチング中...';
-  var scored = allSenpai.map(function(s){ return {s:s, score:scoreMatch(s,moyaText,industry,occupation)}; })
-    .sort(function(a,b){ return b.score-a.score; }).slice(0,3);
-  var results = document.getElementById('match-results');
-  results.innerHTML = scored.map(function(item,i){
-    var s = item.s;
-    return '<div class="match-card" id="match-'+i+'">' +
-      '<div class="match-rank">MATCH '+(i+1)+'</div>' +
-      '<h4>「'+(s['タイトル']||'')+'」</h4>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;"><span class="tag">'+(s['年代']||'')+' '+(s['性別']||'')+'</span></div>' +
-      '<div class="match-reason loading" id="reason-'+i+'">マッチング理由を生成中...</div>' +
-    '</div>';
-  }).join('');
-  btn.disabled = false; btn.textContent = 'マッチングする';
-  scored.forEach(async function(item, i){
-    var s = item.s;
-    try {
-      var res = await fetch(GAS_URL, {
-        method:'POST',
-        redirect: 'follow',
-        body: JSON.stringify({action:'generateReason', moyaText:moyaText, industry:industry, occupation:occupation, action2:selectedAction,
-          senpai:{type:s['転機の型']||'', moya:s['モヤモヤタイプ']||'', episode:s['エピソード要約（分析用）']||'', firstStep:s['最初の一手']||'', coachType:s['得意な後輩タイプ']||''}})
-      });
-      var data = await res.json();
-      var el = document.getElementById('reason-'+i);
-      if (el) { el.textContent = data.reason||''; el.classList.remove('loading'); }
-    } catch(e) {
-      var el = document.getElementById('reason-'+i);
-      if (el) { el.textContent = 'この先輩の経験がヒントになるかもしれません。'; el.classList.remove('loading'); }
-    }
-  });
-}
-
-function openAiAnalysis() {
-  if (aiUnlocked) { showAiModal(); } else { openModal('pw-modal'); }
-}
-function checkPw() {
-  if (document.getElementById('pw-input').value === ADMIN_PW) {
-    aiUnlocked = true;
-    closeModal('pw-modal');
-    document.getElementById('pw-input').value = '';
-    document.getElementById('pw-error').textContent = '';
-    showAiModal();
-  } else {
-    document.getElementById('pw-error').textContent = 'パスワードが正しくありません';
-  }
-}
-function showAiModal() {
-  var c = document.getElementById('ai-presets');
-  c.innerHTML = AI_PRESETS.map(function(p){
-    return '<button class="filter-btn" onclick="document.getElementById(\'ai-input\').value=\''+p+'\';runAiAnalysis()">'+p+'</button>';
-  }).join('');
-  openModal('ai-modal');
-}
-
-async function runAiAnalysis() {
-  var q = document.getElementById('ai-input').value.trim();
-  if (!q) return;
-  var el = document.getElementById('ai-result');
-  el.textContent = '分析中...';
-  var dbSummary = allSenpai.slice(0, 8).map(function(s){
-    return '['+s['年代']+s['性別']+' '+s['キャリア上昇類型']+'] モヤモヤ='+s['モヤモヤタイプ']+' タイトル='+s['タイトル'];
-  }).join('\n');
-  try {
-    var url = GAS_URL + '?action=analyzeDB&question=' + encodeURIComponent(q) + '&dbSummary=' + encodeURIComponent(dbSummary);
-    var res = await fetch(url, {redirect: 'follow'});
-    var data = await res.json();
-    el.textContent = data.result || data.error || 'レスポンスが空です';
-  } catch(e) {
-    el.textContent = 'fetch失敗: ' + e.message;
-  }
-}
-
-loadData();
+loadData(currentLang);
 </script>
 </body>
 </html>
