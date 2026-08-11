@@ -11,6 +11,9 @@
   --c-border:#e0d5c4; --c-accent:#1e2d4a; --c-accent2:#c8602a;
   --c-gold:#b8922a; --c-cream:#f5ede0; --c-sand:#e8d5bc;
   --c-tag-bg:#f0e8d8; --radius:12px; --radius-sm:8px;
+  /* Hero background photo/illustration. Leave empty ('') to keep the plain hero. */
+  --hero-image: '';
+  --hero-overlay: rgba(247,242,234,0.82);
 }
 * { box-sizing:border-box; margin:0; padding:0; }
 body { font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif; background:var(--c-bg); color:var(--c-text); font-size:15px; line-height:1.7; }
@@ -38,6 +41,43 @@ hr { border:none; border-top:1px solid var(--c-border); }
 .btn-primary { background:var(--c-accent); color:var(--c-cream); }
 .btn-outline { background:transparent; color:var(--c-accent2); border:2px solid var(--c-accent2); }
 .btn:hover { opacity:.8; }
+
+/* Hero background photo/illustration (optional, controlled by heroImage in JS) */
+.hero-bg { position:relative; background:var(--c-bg); }
+.hero-bg.has-image { background-size:cover; background-position:center; }
+.hero-bg.has-image::before { content:''; position:absolute; inset:0; background:var(--hero-overlay); }
+.hero-bg .hero { position:relative; z-index:1; }
+
+/* NEW STORIES */
+#new-stories { background:var(--c-bg); padding-top:56px; padding-bottom:56px; }
+.ns-head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:28px; flex-wrap:wrap; }
+.ns-head-text .s-label { margin-bottom:6px; }
+.ns-head-text .s-title { margin-bottom:6px; }
+.ns-head-text .s-desc { margin-bottom:0; }
+.ns-all-link { font-size:13px; color:var(--c-accent2); white-space:nowrap; border-bottom:1px solid transparent; transition:border-color .15s; }
+.ns-all-link:hover { border-color:var(--c-accent2); }
+.ns-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.story-card {
+  display:block; position:relative; border:1px solid var(--c-border); border-radius:var(--radius);
+  overflow:hidden; background:var(--c-white); cursor:pointer;
+  box-shadow:0 1px 3px rgba(26,26,46,.03); transition:box-shadow .2s, transform .15s;
+}
+.story-card:hover { box-shadow:0 6px 18px rgba(26,26,46,.07); transform:translateY(-2px); }
+.story-media { height:150px; background-size:cover; background-position:center; background-color:var(--c-cream); position:relative; }
+.story-media::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(26,26,46,0) 55%, rgba(26,26,46,.35) 100%); }
+.story-num { position:absolute; top:12px; left:14px; font-size:12px; font-weight:700; letter-spacing:.06em; color:#fff; z-index:1; text-shadow:0 1px 3px rgba(0,0,0,.35); }
+.story-body { padding:18px 18px 20px; }
+.story-meta { font-size:11px; color:var(--c-sub); margin-bottom:10px; }
+.story-title { font-size:15px; font-weight:700; line-height:1.6; margin-bottom:8px; }
+.story-desc { font-size:12.5px; color:var(--c-sub); line-height:1.75; margin-bottom:14px; }
+.story-tags { display:flex; flex-wrap:wrap; gap:6px; }
+.story-tag { font-size:11px; color:var(--c-gold); }
+@media (max-width:900px) {
+  .ns-grid { grid-template-columns:repeat(3,minmax(240px,1fr)); grid-auto-flow:column; overflow-x:auto; scroll-snap-type:x proximity; padding-bottom:8px; margin:0 -24px; padding-left:24px; padding-right:24px; }
+  .story-card { scroll-snap-align:start; }
+  .ns-grid::-webkit-scrollbar { height:4px; }
+  .ns-grid::-webkit-scrollbar-thumb { background:var(--c-border); border-radius:4px; }
+}
 .concept-grid { display:grid; grid-template-columns:1fr; gap:16px; }
 .concept-card { background:var(--c-white); border:1px solid var(--c-border); border-radius:var(--radius); padding:24px; display:flex; gap:20px; align-items:flex-start; }
 .concept-num { font-size:28px; font-weight:700; color:var(--c-gold); flex-shrink:0; line-height:1; width:40px; }
@@ -123,9 +163,9 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
   <div class="nav-logo">Repattern</div>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="#concept" data-i18n="navConcept">コンセプト</a>
-      <a href="#stats" data-i18n="navData">データ</a>
       <a href="#senpai" data-i18n="navSenpai">せんぱい一覧</a>
+      <a href="#stats" data-i18n="navData">データ</a>
+      <a href="#concept" data-i18n="navConcept">コンセプト</a>
     </div>
     <div class="lang-toggle">
       <button id="lang-ja-btn" class="active" onclick="setLang('ja')">日本語</button>
@@ -134,6 +174,7 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
   </div>
 </nav>
 
+<div class="hero-bg" id="hero-bg">
 <section class="hero" style="padding:80px 24px 64px;">
   <div class="hero-label">Career Pattern Lab</div>
   <div style="margin-bottom:28px;">
@@ -152,32 +193,20 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
     <button class="btn btn-primary" onclick="scrollToId('senpai')" data-i18n="btnViewSenpai">せんぱいを見る</button>
   </div>
 </section>
+</div>
 <hr>
 
-<section id="concept" style="background:var(--c-white);">
+<section id="new-stories">
   <div class="inner">
-    <div class="s-label">Concept</div>
-    <div class="s-title" data-i18n="conceptTitle">なぜ Repattern なのか</div>
-    <div class="s-desc" data-i18n="conceptDesc">キャリアの悩みは、答えを急ぐより「似た転機を経た人の話」を聞くことで、動き出せることがある。</div>
-    <div class="concept-grid">
-      <div class="concept-card"><div class="concept-num">01</div><div><h3 data-i18n="concept1Title">転機には「型」がある</h3><p data-i18n="concept1Body">一見バラバラに見えるキャリアの変化も、パターンに分類できる。あなたのモヤモヤに近い型を持つ先輩が、必ずいる。</p></div></div>
-      <div class="concept-card"><div class="concept-num">02</div><div><h3 data-i18n="concept2Title">しくじりも資産になる</h3><p data-i18n="concept2Body">成功談だけでなく、失敗・割り切り・本音のしんどさまで共有する。だから、リアルな参考になる。</p></div></div>
-      <div class="concept-card"><div class="concept-num">03</div><div><h3 data-i18n="concept3Title">受け取ったものを返す</h3><p data-i18n="concept3Body">先輩が後輩へ、後輩がまた次の世代へ。キャリアの知恵を循環させるプラットフォームを目指す。</p></div></div>
+    <div class="ns-head">
+      <div class="ns-head-text">
+        <div class="s-label">New Stories</div>
+        <div class="s-title" data-i18n="newStoriesTitle">NEW STORIES</div>
+        <div class="s-desc" data-i18n="newStoriesDesc">最近追加された3つの人生</div>
+      </div>
+      <a href="#senpai" class="ns-all-link" data-i18n="newStoriesAll" onclick="event.preventDefault();scrollToId('senpai');">すべてのストーリーへ →</a>
     </div>
-  </div>
-</section>
-<hr>
-
-<hr>
-
-<section id="stats">
-  <div class="inner">
-    <div class="s-label">Data</div>
-    <div class="s-title" data-i18n="statsTitle">せんぱいDB の傾向</div>
-    <div class="s-desc" data-i18n="statsDesc">インタビューデータから見えてくるキャリア転機のパターン。</div>
-    <div class="summary-box"><p id="summary-text" data-i18n="senpaiLoading">データを読み込み中...</p></div>
-    <div class="stats-grid" id="stats-grid"></div>
-    <div class="bar-charts" id="bar-charts"></div>
+    <div class="ns-grid" id="ns-grid"></div>
   </div>
 </section>
 <hr>
@@ -202,6 +231,33 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
 </section>
 <hr>
 
+<section id="stats">
+  <div class="inner">
+    <div class="s-label">Data</div>
+    <div class="s-title" data-i18n="statsTitle">せんぱいDB の傾向</div>
+    <div class="s-desc" data-i18n="statsDesc">インタビューデータから見えてくるキャリア転機のパターン。</div>
+    <div class="summary-box"><p id="summary-text" data-i18n="senpaiLoading">データを読み込み中...</p></div>
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="bar-charts" id="bar-charts"></div>
+  </div>
+</section>
+<hr>
+
+<section id="concept" style="background:var(--c-white);">
+  <div class="inner">
+    <div class="s-label">Concept</div>
+    <div class="s-title" data-i18n="conceptTitle">なぜ Repattern なのか</div>
+    <div class="s-desc" data-i18n="conceptDesc">キャリアの悩みは、答えを急ぐより「似た転機を経た人の話」を聞くことで、動き出せることがある。</div>
+    <div class="concept-grid">
+      <div class="concept-card"><div class="concept-num">01</div><div><h3 data-i18n="concept1Title">転機には「型」がある</h3><p data-i18n="concept1Body">一見バラバラに見えるキャリアの変化も、パターンに分類できる。あなたのモヤモヤに近い型を持つ先輩が、必ずいる。</p></div></div>
+      <div class="concept-card"><div class="concept-num">02</div><div><h3 data-i18n="concept2Title">しくじりも資産になる</h3><p data-i18n="concept2Body">成功談だけでなく、失敗・割り切り・本音のしんどさまで共有する。だから、リアルな参考になる。</p></div></div>
+      <div class="concept-card"><div class="concept-num">03</div><div><h3 data-i18n="concept3Title">受け取ったものを返す</h3><p data-i18n="concept3Body">先輩が後輩へ、後輩がまた次の世代へ。キャリアの知恵を循環させるプラットフォームを目指す。</p></div></div>
+    </div>
+  </div>
+</section>
+<hr>
+
+
 <section id="about" style="background:var(--c-white);">
   <div class="inner">
     <div class="s-label">About</div>
@@ -210,7 +266,7 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
       <div style="display:flex;align-items:center;gap:16px;">
         <div style="width:56px;height:56px;border-radius:50%;background:var(--c-accent);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--c-cream);flex-shrink:0;">MY</div>
         <div>
-          <div style="font-size:18px;font-weight:700;margin-bottom:2px;">Miki Yamashita</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:2px;">Miki</div>
           <div style="font-size:13px;color:var(--c-sub);">人材業界 / DX推進</div>
         </div>
       </div>
@@ -251,6 +307,64 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
 var GAS_URL = "https://script.google.com/macros/s/AKfycbzRLPSAX5nhj-p_St8A5n6kLBAXmUp-3RtQctl96Am8z7-odjl8Tn2Ges_TegB8rZUI/exec";
 var CAREER_COLOR = {'機会捕捉型':'#1e2d4a','越境再編集型':'#c8602a','戦略蓄積型':'#b8922a'};
 
+/* ---------- Hero background ----------
+   Set to '' to keep the plain hero (no image).
+   Change this one line to swap the hero photo/illustration. */
+var heroImage = "";
+// var heroImage = "assets/hero/hero01.jpg";
+
+/* ---------- NEW STORIES ----------
+   Edit this array to change the 3 featured stories on the top page.
+   Only entries with published:true are eligible, and only the first
+   3 (in array order) are shown — set featuredOrder to control which
+   3 appear first if you keep more than 3 in the array.
+   Each text field can take a plain string (used for both languages)
+   or an { ja:'...', en:'...' } object for full bilingual control. */
+var featuredStories = [
+  {
+    id: "story01",
+    number: "01",
+    role: { ja:"舞師", en:"Dance Master" },
+    age: { ja:"40代", en:"40s" },
+    gender: { ja:"女性", en:"Female" },
+    title: { ja:"頭ではなく、腹で決める。", en:"Decide from the gut, not the head." },
+    description: { ja:"国連職員を目指していた彼女が、舞の世界へ。", en:"She once aimed to work at the UN — then found her way into the world of dance." },
+    tags: { ja:["機会捕捉","越境","独立"], en:["Opportunity Capture","Boundary Crossing","Independence"] },
+    image: "",
+    path: "",
+    published: true,
+    featuredOrder: 1
+  },
+  {
+    id: "story02",
+    number: "02",
+    role: { ja:"獣医師", en:"Veterinarian" },
+    age: { ja:"40代", en:"40s" },
+    gender: { ja:"女性", en:"Female" },
+    title: { ja:"この大変さなら、\n人生をかけられる。", en:"This kind of hard, I can give my life to." },
+    description: { ja:"10年の臨床の先で見つけた、もうひとつの医療のかたち。", en:"After ten years in clinical practice, she found another shape medicine could take." },
+    tags: { ja:["環境ミスマッチ","越境","専門職"], en:["Environment Mismatch","Boundary Crossing","Specialist"] },
+    image: "",
+    path: "",
+    published: true,
+    featuredOrder: 2
+  },
+  {
+    id: "story03",
+    number: "03",
+    role: { ja:"起業家", en:"Founder" },
+    age: { ja:"30代", en:"30s" },
+    gender: { ja:"男性", en:"Male" },
+    title: { ja:"戦略は、後からついてきた。", en:"The strategy came later." },
+    description: { ja:"積み重ねてきた蓄積が、ある日ひとつの道になった。", en:"Years of quiet accumulation turned, one day, into a single path." },
+    tags: { ja:["戦略蓄積","独立","再編集"], en:["Strategic Accumulation","Independence","Re-editing"] },
+    image: "",
+    path: "",
+    published: true,
+    featuredOrder: 3
+  }
+];
+
 /* ---------- i18n ---------- */
 var I18N = {
   ja: {
@@ -259,6 +373,7 @@ var I18N = {
     heroMain:'悩んでいるのはあなただけじゃない。<br>先を歩いた人の「転機の型」が、次の一歩を照らす。',
     heroSub:'Repatternは、キャリアの迷いや転機を記録し、次の誰かへつないでいく個人プロジェクトです。',
     btnTryMatching:'マッチングを試す', btnViewSenpai:'せんぱいを見る',
+    newStoriesTitle:'NEW STORIES', newStoriesDesc:'最近追加された3つの人生', newStoriesAll:'すべてのストーリーへ →',
     conceptTitle:'なぜ Repattern なのか',
     conceptDesc:'キャリアの悩みは、答えを急ぐより「似た転機を経た人の話」を聞くことで、動き出せることがある。',
     concept1Title:'転機には「型」がある',
@@ -298,6 +413,7 @@ var I18N = {
     heroMain:"You're not the only one struggling.<br>The patterns of those who walked before you can light the next step.",
     heroSub:'Repattern is an independent project that records career doubts and turning points, and passes them on to whoever needs them next.',
     btnTryMatching:'Try Matching', btnViewSenpai:'View Senpai',
+    newStoriesTitle:'NEW STORIES', newStoriesDesc:'Three lives, recently added', newStoriesAll:'All stories →',
     conceptTitle:'Why Repattern',
     conceptDesc:'Career worries often move forward not by rushing to an answer, but by hearing the story of someone who lived through a similar turning point.',
     concept1Title:'Turning points follow patterns',
@@ -351,6 +467,7 @@ function setLang(lang) {
   document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el){
     el.placeholder = t(el.dataset.i18nPlaceholder);
   });
+  renderFeaturedStories();
   if (allSenpai.length) { showing = 3; loadData(lang); }
 }
 
@@ -361,6 +478,56 @@ var currentFilter = 'all';
 function scrollToId(id) { document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
 function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+
+/* Returns the localized value of a field that may be a plain string
+   or a { ja, en } object, falling back gracefully either way. */
+function loc(field) {
+  if (field == null) return '';
+  if (typeof field === 'string') return field;
+  return field[currentLang] || field.ja || field.en || '';
+}
+function locList(field) {
+  if (field == null) return [];
+  if (Array.isArray(field)) return field;
+  return field[currentLang] || field.ja || field.en || [];
+}
+
+function applyHeroImage() {
+  var wrap = document.getElementById('hero-bg');
+  if (heroImage) {
+    wrap.classList.add('has-image');
+    wrap.style.backgroundImage = "url('" + heroImage + "')";
+  } else {
+    wrap.classList.remove('has-image');
+    wrap.style.backgroundImage = '';
+  }
+}
+
+function renderFeaturedStories() {
+  var grid = document.getElementById('ns-grid');
+  if (!grid) return;
+  var items = featuredStories
+    .filter(function(s){ return s.published !== false; })
+    .sort(function(a,b){ return (a.featuredOrder||0) - (b.featuredOrder||0); })
+    .slice(0, 3);
+  grid.innerHTML = '';
+  items.forEach(function(s) {
+    var tags = locList(s.tags).map(function(tag){ return '<span class="story-tag">#'+tag+'</span>'; }).join('');
+    var mediaStyle = s.image ? "background-image:url('"+s.image+"');" : '';
+    var card = document.createElement('div');
+    card.className = 'story-card';
+    card.innerHTML =
+      '<div class="story-media" style="'+mediaStyle+'"><span class="story-num">'+(s.number||'')+'</span></div>' +
+      '<div class="story-body">' +
+        '<div class="story-meta">'+loc(s.role)+(loc(s.role)&&loc(s.age)?'｜':'')+loc(s.age)+(loc(s.age)&&loc(s.gender)?'・':'')+loc(s.gender)+'</div>' +
+        '<div class="story-title">'+loc(s.title).replace(/\n/g,'<br>')+'</div>' +
+        '<div class="story-desc">'+loc(s.description).replace(/\n/g,'<br>')+'</div>' +
+        '<div class="story-tags">'+tags+'</div>' +
+      '</div>';
+    card.onclick = function(){ if (s.path) { window.location.href = s.path; } };
+    grid.appendChild(card);
+  });
+}
 
 var senpaiCache = {}; // { ja: [...], en: [...] }
 
@@ -382,6 +549,10 @@ async function loadData(lang) {
     var res = await fetch(GAS_URL + '?lang=' + encodeURIComponent(lang), {redirect:'follow'});
     var data = await res.json();
     var list = Array.isArray(data) ? data : [];
+    list = list.filter(function(s){
+      var flag = s['公開'] !== undefined ? s['公開'] : s['published'];
+      return !(flag === false || flag === 'false' || flag === '非公開' || flag === 'FALSE');
+    });
     senpaiCache[lang] = list;
     allSenpai = list;
     renderFilters();
@@ -526,6 +697,8 @@ function renderStats() {
     : ('Common patterns emerge from the current '+total+' senpai in the database. The most frequent concerns are "future anxiety" and "growth stagnation" — turning points shaped by the question "is it okay to keep going like this?" The most common action style is "prepare then move," suggesting that turning points tend to come less from impulsive decisions and more from sitting with discomfort while waiting for the right opportunity. The most frequent pattern type is "role transformation" — turning points reached more often by expanding one\'s role within the same organization than by a dramatic industry switch.');
 }
 
+applyHeroImage();
+renderFeaturedStories();
 loadData(currentLang);
 </script>
 </body>
