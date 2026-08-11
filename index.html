@@ -81,6 +81,14 @@ hr { border:none; border-top:1px solid var(--c-border); }
 .story-desc { font-size:12.5px; color:var(--c-sub); line-height:1.75; margin-bottom:14px; }
 .story-tags { display:flex; flex-wrap:wrap; gap:6px; }
 .story-tag { font-size:11px; color:var(--c-gold); }
+.story-skeleton { display:flex; flex-direction:column; gap:0; }
+.sk-line { background:var(--c-tag-bg); border-radius:4px; height:11px; }
+.sk-w40 { width:40%; }
+.sk-w90 { width:90%; }
+.sk-w70 { width:70%; }
+.sk-w50 { width:50%; }
+.story-card-pending { cursor:default; }
+.story-card-pending:hover { box-shadow:0 1px 3px rgba(26,26,46,.03); transform:none; }
 @media (max-width:900px) {
   .ns-grid { grid-template-columns:repeat(3,minmax(240px,1fr)); grid-auto-flow:column; overflow-x:auto; scroll-snap-type:x proximity; padding-bottom:8px; margin:0 -24px; padding-left:24px; padding-right:24px; }
   .story-card { scroll-snap-align:start; }
@@ -533,6 +541,15 @@ function senpaiRowId(s) {
   return v;
 }
 
+/* Normalizes an ID for comparison so "3", "03", and "003" are all
+   treated as the same ID — the spreadsheet's GAS script zero-pads
+   IDs to 3 digits (e.g. "003"), but it's easy to type a featured
+   story's dbId without the padding, so comparisons shouldn't care. */
+function normalizeId(v) {
+  var str = String(v == null ? '' : v).trim();
+  return /^\d+$/.test(str) ? String(parseInt(str, 10)) : str;
+}
+
 function scrollToId(id) { document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
 function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
@@ -561,6 +578,38 @@ function applyHeroImage() {
   }
 }
 
+/* Finds the DB record a story is linked to via dbId (if any). Reads
+   from the unfiltered raw cache so it still works even before the
+   directory's public-flag-filtered list has been built. */
+function findFeaturedDbMatch(story) {
+  var dbId = normalizeId(story.dbId);
+  if (!dbId) return null;
+  var pool = rawSenpaiCache[currentLang] || allSenpai;
+  return pool.find(function(s){ return normalizeId(senpaiRowId(s)) === dbId; }) || null;
+}
+
+/* Returns the fields actually shown on a NEW STORIES card. When the
+   story is linked to a DB row (dbId matches), the card shows that
+   row's real title/quote/meta/tags — not the local placeholder text
+   in featuredStories — so the card and its modal always agree. */
+function getFeaturedDisplay(story) {
+  var match = findFeaturedDbMatch(story);
+  if (!match) {
+    return {
+      role: loc(story.role), age: loc(story.age), gender: loc(story.gender),
+      title: loc(story.title), description: loc(story.description),
+      tags: locList(story.tags)
+    };
+  }
+  var tags = (match['モヤモヤタイプ'] || '').split(/[,、\n]/).map(function(t){ return t.trim(); }).filter(Boolean);
+  return {
+    role: match['職種・役職'] || '', age: match['年代'] || '', gender: match['性別'] || '',
+    title: match['タイトル'] || loc(story.title),
+    description: match['転機の一言'] || loc(story.description),
+    tags: tags.length ? tags.slice(0,4) : locList(story.tags)
+  };
+}
+
 function renderFeaturedStories() {
   var grid = document.getElementById('ns-grid');
   if (!grid) return;
@@ -568,22 +617,42 @@ function renderFeaturedStories() {
     .filter(function(s){ return s.published !== false; })
     .sort(function(a,b){ return (a.featuredOrder||0) - (b.featuredOrder||0); })
     .slice(0, 3);
+  var dataLoaded = !!rawSenpaiCache[currentLang];
   grid.innerHTML = '';
   items.forEach(function(s, idx) {
-    var tags = locList(s.tags).map(function(tag){ return '<span class="story-tag">#'+tag+'</span>'; }).join('');
     var mediaStyle = s.image ? "background-image:url('"+s.image+"');" : '';
     var mediaClass = s.image ? '' : ' ph-'+(idx % 3);
+    var mediaHtml = '<div class="story-media'+mediaClass+'" style="'+mediaStyle+'"><span class="story-num">'+(s.number||'')+'</span></div>';
     var card = document.createElement('div');
-    card.className = 'story-card';
-    card.innerHTML =
-      '<div class="story-media'+mediaClass+'" style="'+mediaStyle+'"><span class="story-num">'+(s.number||'')+'</span></div>' +
-      '<div class="story-body">' +
-        '<div class="story-meta">'+loc(s.role)+(loc(s.role)&&loc(s.age)?'｜':'')+loc(s.age)+(loc(s.age)&&loc(s.gender)?'・':'')+loc(s.gender)+'</div>' +
-        '<div class="story-title">'+loc(s.title).replace(/\n/g,'<br>')+'</div>' +
-        '<div class="story-desc">'+loc(s.description).replace(/\n/g,'<br>')+'</div>' +
-        '<div class="story-tags">'+tags+'</div>' +
-      '</div>';
-    card.onclick = function(){ openFeaturedDetail(s); };
+
+    var linkedToDb = !!normalizeId(s.dbId);
+    var pending = linkedToDb && !dataLoaded;
+
+    if (pending) {
+      // Waiting on the DB fetch — show a quiet skeleton instead of the local placeholder text.
+      card.className = 'story-card story-card-pending';
+      card.innerHTML =
+        mediaHtml +
+        '<div class="story-body story-skeleton">' +
+          '<div class="sk-line sk-w40" style="height:9px;"></div>' +
+          '<div class="sk-line sk-w90" style="height:16px;margin-top:12px;"></div>' +
+          '<div class="sk-line sk-w70" style="margin-top:14px;"></div>' +
+          '<div class="sk-line sk-w50" style="margin-top:6px;"></div>' +
+        '</div>';
+    } else {
+      var d = getFeaturedDisplay(s);
+      var tags = d.tags.map(function(tag){ return '<span class="story-tag">#'+tag+'</span>'; }).join('');
+      card.className = 'story-card';
+      card.innerHTML =
+        mediaHtml +
+        '<div class="story-body">' +
+          '<div class="story-meta">'+d.role+(d.role&&d.age?'｜':'')+d.age+(d.age&&d.gender?'・':'')+d.gender+'</div>' +
+          '<div class="story-title">'+String(d.title).replace(/\n/g,'<br>')+'</div>' +
+          '<div class="story-desc">'+String(d.description).replace(/\n/g,'<br>')+'</div>' +
+          '<div class="story-tags">'+tags+'</div>' +
+        '</div>';
+      card.onclick = function(){ openFeaturedDetail(s); };
+    }
     grid.appendChild(card);
   });
 }
@@ -594,10 +663,7 @@ function renderFeaturedStories() {
    full layout (episode / letGo / growth / learn / firstStep) is
    built from this story's own fields, so the two feel identical. */
 function openFeaturedDetail(story) {
-  var dbId = String(story.dbId || '').trim();
-  var match = dbId
-    ? allSenpai.find(function(s){ return String(senpaiRowId(s)).trim() === dbId; })
-    : null;
+  var match = findFeaturedDbMatch(story);
   if (match) { openDetail(match); return; }
 
   var tags = locList(story.tags).map(function(tag){ return '<span class="tag">'+tag+'</span>'; }).join('');
@@ -620,7 +686,37 @@ function openFeaturedDetail(story) {
   openModal('detail-modal');
 }
 
-var senpaiCache = {}; // { ja: [...], en: [...] }
+var senpaiCache = {}; // { ja: [...], en: [...] } — filtered by 公開, feeds the directory below
+var rawSenpaiCache = {}; // { ja: [...], en: [...] } — unfiltered, used only for NEW STORIES ID matching
+
+/* Debug helper: visit the site with ?debug=1 in the URL (e.g.
+   https://komiki1987.github.io/repattern/?debug=1) to see a small
+   panel at the bottom of the screen listing the exact column names
+   and ID values coming back from the spreadsheet — useful for
+   checking why a dbId in featuredStories isn't matching. Remove
+   ?debug=1 from the URL (or just don't add it) and the panel never
+   appears for regular visitors. */
+function isDebugMode() {
+  return location.search.indexOf('debug=1') !== -1;
+}
+function renderDebugPanel(list) {
+  if (!isDebugMode()) return;
+  var keys = list.length ? Object.keys(list[0]) : [];
+  var ids = list.map(function(s){ return senpaiRowId(s); });
+  var wanted = featuredStories.map(function(fs){ return fs.id + ' → dbId: "' + fs.dbId + '"'; });
+  var panel = document.getElementById('debug-panel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'debug-panel';
+    panel.style.cssText = 'position:fixed;bottom:0;left:0;right:0;max-height:45vh;overflow:auto;background:#111;color:#8f8;font:12px/1.6 monospace;padding:14px;z-index:9999;white-space:pre-wrap;';
+    document.body.appendChild(panel);
+  }
+  panel.textContent =
+    '[DEBUG] rows loaded: ' + list.length + '\n' +
+    '[DEBUG] column names from spreadsheet: ' + JSON.stringify(keys) + '\n' +
+    '[DEBUG] ID values found (via senpaiRowId): ' + JSON.stringify(ids) + '\n' +
+    '[DEBUG] featuredStories dbId settings: ' + wanted.join(' | ');
+}
 
 async function loadData(lang) {
   lang = lang || 'ja';
@@ -629,6 +725,8 @@ async function loadData(lang) {
     renderFilters();
     renderSenpai();
     renderStats();
+    renderDebugPanel(rawSenpaiCache[lang] || senpaiCache[lang]);
+    if (lang === currentLang) renderFeaturedStories();
     return;
   }
   var loading = document.getElementById('senpai-loading');
@@ -639,8 +737,9 @@ async function loadData(lang) {
   try {
     var res = await fetch(GAS_URL + '?lang=' + encodeURIComponent(lang), {redirect:'follow'});
     var data = await res.json();
-    var list = Array.isArray(data) ? data : [];
-    list = list.filter(function(s){
+    var rawList = Array.isArray(data) ? data : [];
+    rawSenpaiCache[lang] = rawList;
+    var list = rawList.filter(function(s){
       var flag = s['公開'] !== undefined ? s['公開'] : s['published'];
       return !(flag === false || flag === 'false' || flag === '非公開' || flag === 'FALSE');
     });
@@ -649,6 +748,8 @@ async function loadData(lang) {
     renderFilters();
     renderSenpai();
     renderStats();
+    renderDebugPanel(rawList);
+    if (lang === currentLang) renderFeaturedStories();
   } catch(e) {
     document.getElementById('senpai-loading').textContent = t('senpaiLoadError');
   }
@@ -672,16 +773,15 @@ function renderFilters() {
    rather than listing them twice. */
 function getFeaturedIds() {
   return featuredStories
-    .filter(function(fs){ return fs.published !== false && String(fs.dbId||'').trim(); })
-    .map(function(fs){ return String(fs.dbId).trim(); });
+    .filter(function(fs){ return fs.published !== false && normalizeId(fs.dbId); })
+    .map(function(fs){ return normalizeId(fs.dbId); });
 }
 
 function getFiltered() {
   var featuredIds = getFeaturedIds();
   var pool = featuredIds.length
     ? allSenpai.filter(function(s){
-        var id = senpaiRowId(s);
-        return featuredIds.indexOf(String(id||'').trim()) === -1;
+        return featuredIds.indexOf(normalizeId(senpaiRowId(s))) === -1;
       })
     : allSenpai;
   if (currentFilter === 'all') {
