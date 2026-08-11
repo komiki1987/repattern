@@ -49,7 +49,12 @@ hr { border:none; border-top:1px solid var(--c-border); }
 .hero-bg .hero { position:relative; z-index:1; }
 
 /* NEW STORIES */
-#new-stories { background:var(--c-bg); padding-top:56px; padding-bottom:56px; }
+#new-stories {
+  background: linear-gradient(180deg, var(--c-cream) 0%, var(--c-bg) 100%);
+  border-top: 1px solid var(--c-sand);
+  border-bottom: 1px solid var(--c-sand);
+  padding-top:56px; padding-bottom:56px;
+}
 .ns-head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:28px; flex-wrap:wrap; }
 .ns-head-text .s-label { margin-bottom:6px; }
 .ns-head-text .s-title { margin-bottom:6px; }
@@ -63,8 +68,12 @@ hr { border:none; border-top:1px solid var(--c-border); }
   box-shadow:0 1px 3px rgba(26,26,46,.03); transition:box-shadow .2s, transform .15s;
 }
 .story-card:hover { box-shadow:0 6px 18px rgba(26,26,46,.07); transform:translateY(-2px); }
-.story-media { height:150px; background-size:cover; background-position:center; background-color:var(--c-cream); position:relative; }
+.story-media { height:150px; background-size:cover; background-position:center; position:relative; }
 .story-media::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(26,26,46,0) 55%, rgba(26,26,46,.35) 100%); }
+/* Themed placeholder gradients (rotates through the 3 career-type colors) when a card has no image */
+.story-media.ph-0 { background-image:linear-gradient(135deg, #24365a 0%, #1e2d4a 55%, #16213a 100%); }
+.story-media.ph-1 { background-image:linear-gradient(135deg, #d97a45 0%, #c8602a 55%, #a84d1f 100%); }
+.story-media.ph-2 { background-image:linear-gradient(135deg, #cfa64a 0%, #b8922a 55%, #96741e 100%); }
 .story-num { position:absolute; top:12px; left:14px; font-size:12px; font-weight:700; letter-spacing:.06em; color:#fff; z-index:1; text-shadow:0 1px 3px rgba(0,0,0,.35); }
 .story-body { padding:18px 18px 20px; }
 .story-meta { font-size:11px; color:var(--c-sub); margin-bottom:10px; }
@@ -266,7 +275,7 @@ footer { padding:40px 24px; text-align:center; font-size:12px; color:var(--c-sub
       <div style="display:flex;align-items:center;gap:16px;">
         <div style="width:56px;height:56px;border-radius:50%;background:var(--c-accent);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--c-cream);flex-shrink:0;">MY</div>
         <div>
-          <div style="font-size:18px;font-weight:700;margin-bottom:2px;">Miki</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:2px;">Miki Yamashita</div>
           <div style="font-size:13px;color:var(--c-sub);">人材業界 / DX推進</div>
         </div>
       </div>
@@ -319,10 +328,25 @@ var heroImage = "";
    3 (in array order) are shown — set featuredOrder to control which
    3 appear first if you keep more than 3 in the array.
    Each text field can take a plain string (used for both languages)
-   or an { ja:'...', en:'...' } object for full bilingual control. */
+   or an { ja:'...', en:'...' } object for full bilingual control.
+
+   Clicking a card opens a full detail modal (same layout as the
+   senpai directory below: episode / what they let go of / growth
+   accelerator / what kohai can learn / first step).
+   - Set dbId to the value in the ID column of that person's row in
+     the senpai spreadsheet (add an "ID" column there if it doesn't
+     exist yet — any unique value works, e.g. 1, 2, 3...). When it
+     matches, the modal pulls the full content straight from the
+     spreadsheet, and that person is automatically hidden from the
+     senpai list below so they aren't shown twice.
+   - If dbId is left empty (no spreadsheet row yet), the episode /
+     letGo / growth / learn / firstStep fields written directly
+     below are used instead, so the modal is just as complete either
+     way — fill these in with the same care as a spreadsheet row. */
 var featuredStories = [
   {
     id: "story01",
+    dbId: "22",
     number: "01",
     role: { ja:"舞師", en:"Dance Master" },
     age: { ja:"40代", en:"40s" },
@@ -330,6 +354,13 @@ var featuredStories = [
     title: { ja:"頭ではなく、腹で決める。", en:"Decide from the gut, not the head." },
     description: { ja:"国連職員を目指していた彼女が、舞の世界へ。", en:"She once aimed to work at the UN — then found her way into the world of dance." },
     tags: { ja:["機会捕捉","越境","独立"], en:["Opportunity Capture","Boundary Crossing","Independence"] },
+    careerType: { ja:"機会捕捉型", en:"Opportunity Capture" },
+    actionStyle: { ja:"見切り発車型", en:"Leap first" },
+    episode: { ja:"国連職員を志して語学と国際関係を学んでいたが、あるとき参加した舞のワークショップで身体が言葉より先に動く感覚に出会う。頭で計画してきたキャリアが、初めて『違う』と感じた瞬間だった。", en:"" },
+    letGo: { ja:"「安定した肩書きを積み上げる」というキャリア観そのもの。", en:"" },
+    growth: { ja:"迷ったときほど、考えるより先に体を動かして試してみたこと。", en:"" },
+    learn: { ja:"論理で決めきれない選択は、行動が先に答えを出すことがある。", en:"" },
+    firstStep: { ja:"月1回、興味のある分野のワークショップに申し込んでみる。", en:"" },
     image: "",
     path: "",
     published: true,
@@ -337,6 +368,7 @@ var featuredStories = [
   },
   {
     id: "story02",
+    dbId: "21",
     number: "02",
     role: { ja:"獣医師", en:"Veterinarian" },
     age: { ja:"40代", en:"40s" },
@@ -344,6 +376,13 @@ var featuredStories = [
     title: { ja:"この大変さなら、\n人生をかけられる。", en:"This kind of hard, I can give my life to." },
     description: { ja:"10年の臨床の先で見つけた、もうひとつの医療のかたち。", en:"After ten years in clinical practice, she found another shape medicine could take." },
     tags: { ja:["環境ミスマッチ","越境","専門職"], en:["Environment Mismatch","Boundary Crossing","Specialist"] },
+    careerType: { ja:"越境再編集型", en:"Boundary Re-editing" },
+    actionStyle: { ja:"準備してから動く", en:"Prepare then move" },
+    episode: { ja:"10年間、臨床獣医師として日々の診療に向き合う中で、治療だけでなく『暮らし方』ごと支える医療への関心が強くなっていった。資格取得や研修を重ねながら、少しずつ次の領域へ準備を進めた。", en:"" },
+    letGo: { ja:"「専門を極めるほど価値が上がる」という一本道のキャリア観。", en:"" },
+    growth: { ja:"焦って転科せず、必要な準備を一つずつ積み上げたこと。", en:"" },
+    learn: { ja:"大変さの種類が変わるだけで、しんどさ自体はなくならない。だからこそ、どのしんどさになら人生をかけられるかで選ぶ。", en:"" },
+    firstStep: { ja:"気になる領域の勉強会に、まずは見学として参加する。", en:"" },
     image: "",
     path: "",
     published: true,
@@ -351,6 +390,7 @@ var featuredStories = [
   },
   {
     id: "story03",
+    dbId: "20",
     number: "03",
     role: { ja:"起業家", en:"Founder" },
     age: { ja:"30代", en:"30s" },
@@ -358,6 +398,13 @@ var featuredStories = [
     title: { ja:"戦略は、後からついてきた。", en:"The strategy came later." },
     description: { ja:"積み重ねてきた蓄積が、ある日ひとつの道になった。", en:"Years of quiet accumulation turned, one day, into a single path." },
     tags: { ja:["戦略蓄積","独立","再編集"], en:["Strategic Accumulation","Independence","Re-editing"] },
+    careerType: { ja:"戦略蓄積型", en:"Strategic Accumulation" },
+    actionStyle: { ja:"内省しながら変化", en:"Reflect then change" },
+    episode: { ja:"独立という選択肢は最初から狙っていたわけではなく、副業や勉強会での小さな実践を重ねるうちに、気づけば事業と呼べるものになっていた。振り返って初めて『これは戦略だった』と言語化できた。", en:"" },
+    letGo: { ja:"「先に計画を固めてから動くべき」という順番へのこだわり。", en:"" },
+    growth: { ja:"小さな実践を辞めずに続け、定期的に振り返って意味づけし直したこと。", en:"" },
+    learn: { ja:"戦略は先に描くものとは限らず、後から見えてくることもある。", en:"" },
+    firstStep: { ja:"今やっている小さな活動を、月末に一度言語化してみる。", en:"" },
     image: "",
     path: "",
     published: true,
@@ -405,7 +452,7 @@ var I18N = {
     aboutBio:'人材業界でDX推進の仕事をしながら、個人で「Repattern」というプロジェクトを続けています。<br><br>キャリアの迷いや転機には、誰かの実例が支えになることがある。<br>そんな経験を、次の世代へつないでいけたらと思っています。<br><br>AIを使いながら、人のキャリア理解を深める実験もゆるやかに続けています。',
     footerTag:'キャリアの転機を、型にする。',
     adminAuthTitle:'管理者認証', adminAuthDesc:'AI深掘り分析はRepattern管理者専用です。', adminPwPlaceholder:'パスワードを入力', adminAuthBtn:'認証する', adminCancelBtn:'キャンセル',
-    modalEpisode:'エピソード', modalLetGo:'手放したもの', modalGrowth:'成長加速ポイント', modalLearn:'後輩が学べること', modalFirstStep:'最初の一手'
+    modalEpisode:'エピソード', modalLetGo:'手放したもの', modalGrowth:'成長加速ポイント', modalLearn:'後輩が学べること', modalFirstStep:'最初の一手', modalReadFull:'続きを読む →'
   },
   en: {
     navConcept:'Concept', navData:'Data', navSenpai:'Senpai', navMatching:'Matching',
@@ -446,7 +493,7 @@ var I18N = {
     aboutBio:'While working on DX promotion in the staffing industry, I run an independent project called "Repattern."<br><br>In moments of career doubt or transition, someone else\'s real example can be a source of support.<br>I hope to pass that kind of experience on to the next generation.<br><br>Alongside this, I\'m quietly experimenting with AI to deepen how we understand people\'s careers.',
     footerTag:'Turning career turning points into patterns.',
     adminAuthTitle:'Admin Authentication', adminAuthDesc:'AI Deep Analysis is for Repattern admin use only.', adminPwPlaceholder:'Enter password', adminAuthBtn:'Authenticate', adminCancelBtn:'Cancel',
-    modalEpisode:'Episode', modalLetGo:'What They Let Go Of', modalGrowth:'Growth Accelerator', modalLearn:'What Kohai Can Learn', modalFirstStep:'First Step'
+    modalEpisode:'Episode', modalLetGo:'What They Let Go Of', modalGrowth:'Growth Accelerator', modalLearn:'What Kohai Can Learn', modalFirstStep:'First Step', modalReadFull:'Read the full story →'
   }
 };
 var currentLang = 'ja';
@@ -474,6 +521,17 @@ function setLang(lang) {
 var allSenpai = [];
 var showing = 3;
 var currentFilter = 'all';
+
+/* Reads a senpai row's ID regardless of how the spreadsheet's
+   header cell for column A is capitalized (ID / Id / id / No / no). */
+function senpaiRowId(s) {
+  var v = s['ID'];
+  if (v == null) v = s['Id'];
+  if (v == null) v = s['id'];
+  if (v == null) v = s['No'];
+  if (v == null) v = s['no'];
+  return v;
+}
 
 function scrollToId(id) { document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
 function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
@@ -511,22 +569,55 @@ function renderFeaturedStories() {
     .sort(function(a,b){ return (a.featuredOrder||0) - (b.featuredOrder||0); })
     .slice(0, 3);
   grid.innerHTML = '';
-  items.forEach(function(s) {
+  items.forEach(function(s, idx) {
     var tags = locList(s.tags).map(function(tag){ return '<span class="story-tag">#'+tag+'</span>'; }).join('');
     var mediaStyle = s.image ? "background-image:url('"+s.image+"');" : '';
+    var mediaClass = s.image ? '' : ' ph-'+(idx % 3);
     var card = document.createElement('div');
     card.className = 'story-card';
     card.innerHTML =
-      '<div class="story-media" style="'+mediaStyle+'"><span class="story-num">'+(s.number||'')+'</span></div>' +
+      '<div class="story-media'+mediaClass+'" style="'+mediaStyle+'"><span class="story-num">'+(s.number||'')+'</span></div>' +
       '<div class="story-body">' +
         '<div class="story-meta">'+loc(s.role)+(loc(s.role)&&loc(s.age)?'｜':'')+loc(s.age)+(loc(s.age)&&loc(s.gender)?'・':'')+loc(s.gender)+'</div>' +
         '<div class="story-title">'+loc(s.title).replace(/\n/g,'<br>')+'</div>' +
         '<div class="story-desc">'+loc(s.description).replace(/\n/g,'<br>')+'</div>' +
         '<div class="story-tags">'+tags+'</div>' +
       '</div>';
-    card.onclick = function(){ if (s.path) { window.location.href = s.path; } };
+    card.onclick = function(){ openFeaturedDetail(s); };
     grid.appendChild(card);
   });
+}
+
+/* Opens the same detail modal used for the senpai directory.
+   If story.dbId matches the ID column of a senpai DB record, the
+   content comes straight from the spreadsheet. Otherwise, the same
+   full layout (episode / letGo / growth / learn / firstStep) is
+   built from this story's own fields, so the two feel identical. */
+function openFeaturedDetail(story) {
+  var dbId = String(story.dbId || '').trim();
+  var match = dbId
+    ? allSenpai.find(function(s){ return String(senpaiRowId(s)).trim() === dbId; })
+    : null;
+  if (match) { openDetail(match); return; }
+
+  var tags = locList(story.tags).map(function(tag){ return '<span class="tag">'+tag+'</span>'; }).join('');
+  var subInfo = [loc(story.careerType), loc(story.actionStyle)].filter(Boolean).join(' / ');
+  var readMore = story.path
+    ? '<div class="m-step"><a href="'+story.path+'" style="color:var(--c-accent);">'+t('modalReadFull')+'</a></div>'
+    : '';
+  document.getElementById('modal-content').innerHTML =
+    '<div style="font-size:12px;color:var(--c-sub);margin-bottom:4px;">'+loc(story.age)+' '+loc(story.gender)+' / '+loc(story.role)+'</div>' +
+    '<h2 style="font-size:18px;font-weight:700;margin-bottom:6px;">「'+loc(story.title).replace(/\n/g,'<br>')+'」</h2>' +
+    '<div class="m-quote">'+loc(story.description).replace(/\n/g,'<br>')+'</div>' +
+    (subInfo ? '<div class="m-sub">'+subInfo+'</div>' : '') +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;">'+tags+'</div>' +
+    '<div class="m-sec"><div class="m-sec-label">'+t('modalEpisode')+'</div><p>'+loc(story.episode).replace(/\n/g,'<br>')+'</p></div>' +
+    '<div class="m-sec"><div class="m-sec-label">'+t('modalLetGo')+'</div><p>'+(loc(story.letGo)||'—').replace(/\n/g,'<br>')+'</p></div>' +
+    '<div class="m-sec"><div class="m-sec-label">'+t('modalGrowth')+'</div><p>'+(loc(story.growth)||'—').replace(/\n/g,'<br>')+'</p></div>' +
+    '<div class="m-sec"><div class="m-sec-label">'+t('modalLearn')+'</div><p>'+(loc(story.learn)||'—').replace(/\n/g,'<br>')+'</p></div>' +
+    '<div class="m-step"><b>'+t('modalFirstStep')+' → </b>'+(loc(story.firstStep)||'—')+'</div>' +
+    readMore;
+  openModal('detail-modal');
 }
 
 var senpaiCache = {}; // { ja: [...], en: [...] }
@@ -576,18 +667,34 @@ function renderFilters() {
   });
 }
 
+/* IDs (from dbId) of currently-published featured stories, so the
+   senpai directory below can hide anyone already shown in NEW STORIES
+   rather than listing them twice. */
+function getFeaturedIds() {
+  return featuredStories
+    .filter(function(fs){ return fs.published !== false && String(fs.dbId||'').trim(); })
+    .map(function(fs){ return String(fs.dbId).trim(); });
+}
+
 function getFiltered() {
+  var featuredIds = getFeaturedIds();
+  var pool = featuredIds.length
+    ? allSenpai.filter(function(s){
+        var id = senpaiRowId(s);
+        return featuredIds.indexOf(String(id||'').trim()) === -1;
+      })
+    : allSenpai;
   if (currentFilter === 'all') {
     var types = ['機会捕捉型','越境再編集型','戦略蓄積型'];
     var initial = [];
     types.forEach(function(t){
-      var found = allSenpai.find(function(s){ return s['キャリア上昇類型'] === t; });
+      var found = pool.find(function(s){ return s['キャリア上昇類型'] === t; });
       if (found) initial.push(found);
     });
-    var rest = allSenpai.filter(function(s){ return initial.indexOf(s) === -1; });
+    var rest = pool.filter(function(s){ return initial.indexOf(s) === -1; });
     return initial.concat(rest);
   }
-  return allSenpai.filter(function(s){ return s['キャリア上昇類型'] === currentFilter; });
+  return pool.filter(function(s){ return s['キャリア上昇類型'] === currentFilter; });
 }
 
 function renderSenpai() {
